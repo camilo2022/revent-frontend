@@ -92,6 +92,9 @@ body {
 // Foco visible y confirmaciones coherentes con el tema
 :focus-visible { outline: 2px solid var(--revent-primary); outline-offset: 2px; }
 .swal2-popup.swal-revent { font-family: inherit; border-radius: 0.75rem; }
+// Listas largas: el encabezado se queda fijo mientras se desplaza la tabla (colores del tema, sirve en oscuro)
+.table-sticky-wrap { max-height: 70vh; overflow: auto; }
+.table-sticky thead th { position: sticky; top: 0; z-index: 2; background-color: var(--cui-card-bg, var(--cui-body-bg)); box-shadow: inset 0 -1px 0 var(--cui-border-color); }
 [data-coreui-theme='dark'] {
   .swal2-popup.swal-revent { background: var(--cui-body-bg); color: var(--cui-body-color); }
   .empty-state svg { opacity: 0.9; }

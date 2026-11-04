@@ -5,6 +5,7 @@ import TechnicalSheetService from '@/services/TechnicalSheetService'
 import ProductService from '@/services/ProductService'
 import { useOptions } from '@/composables/useOptions'
 import { useServerErrors } from '@/composables/useServerErrors'
+import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import FormField from '@/components/UI/templates/FormField.vue'
 import LoadingForm from '@/components/UI/templates/Skeleton.vue'
 import ErrorSummary from '@/components/UI/templates/ErrorSummary.vue'
@@ -17,6 +18,8 @@ const emit = defineEmits(['saved', 'cancel'])
 const { options, loadOptions } = useOptions()
 const { errors, message, get, clear, handle } = useServerErrors()
 const route = useRoute()
+// Aviso de cambios sin guardar (campos + especificaciones)
+const { mark, confirmLeave } = useUnsavedChanges(() => JSON.stringify({ form, specs: specs.value }))
 
 const loading = ref(true)
 const saving = ref(false)
@@ -57,6 +60,7 @@ onMounted(async () => {
     handle(error)
   }
   loading.value = false
+  mark()
 })
 
 // Pares clave/valor => objeto { clave: valor }
@@ -75,6 +79,7 @@ const save = async () => {
     } else {
       res = await TechnicalSheetService.store(body)
     }
+    mark() // guardado: no preguntar al cerrar
     emit('saved', res.data.technical_sheet?.id ?? props.id)
   } catch (error) {
     handle(error)
@@ -148,7 +153,7 @@ const save = async () => {
 
     <RequiredNote />
     <div class="d-flex justify-content-end gap-2 mt-3">
-      <CButton color="secondary" variant="outline" @click="emit('cancel')">Cancelar</CButton>
+      <CButton color="secondary" variant="outline" @click="confirmLeave().then((ok) => ok && emit('cancel'))">Cancelar</CButton>
       <CButton type="submit" color="primary" :disabled="saving"><CSpinner v-if="saving" size="sm" /> Guardar</CButton>
     </div>
   </form>

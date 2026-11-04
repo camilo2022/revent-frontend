@@ -5,6 +5,7 @@ import ProductService from '@/services/ProductService'
 import { useOptions } from '@/composables/useOptions'
 import { useServerErrors } from '@/composables/useServerErrors'
 import { usePermissions } from '@/composables/usePermissions'
+import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import { confirmAction, notify } from '@/utils/swal'
 import FormField from '@/components/UI/templates/FormField.vue'
 import LoadingForm from '@/components/UI/templates/Skeleton.vue'
@@ -25,6 +26,8 @@ const saving = ref(false)
 const product = ref(null)
 const form = reactive({ collection_id: '', name: '', description: '', price: null, cost: null })
 const colors = ref([])
+// Aviso de cambios sin guardar (campos + colores y tallas)
+const { mark, confirmLeave } = useUnsavedChanges(() => JSON.stringify({ form, colors: colors.value }))
 
 // Vista previa del código: lo genera el servidor al guardar
 const nextCode = computed(() => options.collections.find((c) => c.id === Number(form.collection_id))?.next_code)
@@ -52,6 +55,7 @@ onMounted(async () => {
     }
   }
   loading.value = false
+  mark()
 })
 
 const save = async () => {
@@ -73,6 +77,7 @@ const save = async () => {
     const res = props.id ? await ProductService.update(props.id, body) : await ProductService.store(body)
     const saved = res.data?.product
     if (saved?.code) notify(`Producto ${saved.code} · ${saved.name} ${props.id ? 'actualizado' : 'creado'}.`)
+    mark() // guardado: no preguntar al cerrar
     emit('saved', saved?.id ?? props.id)
     // Siguiente paso: la ficha técnica (solo al crear y si tiene permiso)
     if (!props.id && saved?.id && can('technical_sheets.store')) {
@@ -143,7 +148,7 @@ const save = async () => {
 
     <RequiredNote />
     <div class="d-flex justify-content-end gap-2 mt-3">
-      <CButton color="secondary" variant="outline" @click="emit('cancel')">Cancelar</CButton>
+      <CButton color="secondary" variant="outline" @click="confirmLeave().then((ok) => ok && emit('cancel'))">Cancelar</CButton>
       <CButton type="submit" color="primary" :disabled="saving"><CSpinner v-if="saving" size="sm" /> Guardar</CButton>
     </div>
   </form>

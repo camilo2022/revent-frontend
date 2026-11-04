@@ -1,5 +1,6 @@
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { onBeforeRouteLeave, useRoute } from 'vue-router'
+import { confirmLeave, setDirtyCheck } from './useUnsavedChanges'
 import { useOptions } from './useOptions'
 import { useServerErrors } from './useServerErrors'
 import { useAlertStore } from '@/stores/alertStore'
@@ -67,8 +68,16 @@ export function useResourceController({ service, Model, configuration: config, f
     }
   }
 
+  // Cambios sin guardar del formulario genérico (los propios registran el suyo)
+  let snapshot = null
+  const serialize = () => JSON.stringify(form.value, (k, v) => (v instanceof File ? v.name : v))
+  if (!config.customForm) setDirtyCheck(() => ['create', 'edit'].includes(mode.value) && snapshot !== null && serialize() !== snapshot)
+  onBeforeRouteLeave(() => confirmLeave())
+
   // Navegación entre paneles
-  const goIndex = () => {
+  const goIndex = async () => {
+    if (!(await confirmLeave())) return
+    snapshot = null
     mode.value = 'index'
     current.value = null
     serverErrors.clear()
@@ -78,6 +87,7 @@ export function useResourceController({ service, Model, configuration: config, f
     form.value = new Model()
     current.value = null
     mode.value = 'create'
+    snapshot = serialize()
   }
   const goEdit = async (row) => {
     serverErrors.clear()
@@ -86,9 +96,14 @@ export function useResourceController({ service, Model, configuration: config, f
       current.value = config.customForm ? row : firstOf(await service.find(row.id))
       if (!config.customForm) form.value = Model.from(current.value)
       mode.value = 'edit'
+      snapshot = serialize()
     } catch (error) {
       serverErrors.handle(error)
     }
+  }
+  // Escape cierra el panel abierto (con el aviso si hay cambios)
+  const onKey = (e) => {
+    if (e.key === 'Escape' && mode.value !== 'index' && !swal.swalData) goIndex()
   }
   const goShow = async (row) => {
     try {
@@ -135,6 +150,7 @@ export function useResourceController({ service, Model, configuration: config, f
     try {
       if (mode.value === 'edit') await (hasFile ? service.updateForm(current.value.id, payload) : service.update(current.value.id, payload))
       else await (hasFile ? service.storeForm(payload) : service.store(payload))
+      snapshot = null // ya está guardado: no preguntar al cerrar
       saved()
     } catch (error) {
       serverErrors.handle(error)
@@ -190,8 +206,13 @@ export function useResourceController({ service, Model, configuration: config, f
     if (q.status && 'status' in filters) filters.status = String(q.status)
     if (q.panel === 'create') goCreate()
     load()
+    window.addEventListener('keydown', onKey)
   })
-  onBeforeUnmount(() => clearTimeout(timer))
+  onBeforeUnmount(() => {
+    clearTimeout(timer)
+    window.removeEventListener('keydown', onKey)
+    setDirtyCheck(null)
+  })
 
   return reactive({
     items, loading, saving, mode, current, form, pagination, filters, options, loadOptions,

@@ -5,6 +5,7 @@ import ProductionOrderService from '@/services/ProductionOrderService'
 import TechnicalSheetService from '@/services/TechnicalSheetService'
 import { useOptions } from '@/composables/useOptions'
 import { useServerErrors } from '@/composables/useServerErrors'
+import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import { money } from '@/utils/format'
 import { notify, notifyError } from '@/utils/swal'
 import { cell, ensureStore, lineTotal, newLine } from '@/utils/orderMatrix'
@@ -21,6 +22,8 @@ const emit = defineEmits(['saved', 'cancel'])
 const { options, loadOptions } = useOptions()
 const { errors, message, get, clear, handle } = useServerErrors()
 const route = useRoute()
+// Aviso de cambios sin guardar (cabecera + matrices por color)
+const { mark, confirmLeave } = useUnsavedChanges(() => JSON.stringify({ form, lines }))
 
 const loading = ref(true)
 const saving = ref(false)
@@ -115,6 +118,7 @@ onMounted(async () => {
     handle(error)
   }
   loading.value = false
+  mark()
 })
 
 // Construye el cuerpo exacto del contrato y recuerda la posición de cada celda
@@ -177,6 +181,7 @@ const save = async () => {
     const saved = res.data?.production_order
     // Mensaje en lenguaje de negocio: "Orden PO-000012 creada"
     if (saved?.consecutive) notify(`Orden ${saved.consecutive} ${props.id ? 'actualizada' : 'creada'} con ${totals.value.pairs} pares.`)
+    mark() // guardado: no preguntar al cerrar
     emit('saved', saved?.id ?? props.id)
   } catch (error) {
     handle(error)
@@ -299,7 +304,7 @@ const save = async () => {
 
     <RequiredNote />
     <div class="d-flex justify-content-end gap-2 mt-3">
-      <CButton color="secondary" variant="outline" @click="emit('cancel')">Cancelar</CButton>
+      <CButton color="secondary" variant="outline" @click="confirmLeave().then((ok) => ok && emit('cancel'))">Cancelar</CButton>
       <CButton type="submit" color="primary" :disabled="saving || !sheet || !totals.pairs"><CSpinner v-if="saving" size="sm" /> Guardar orden</CButton>
     </div>
 

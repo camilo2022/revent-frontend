@@ -12,6 +12,16 @@ import Skeleton from './Skeleton.vue'
 const props = defineProps({ ctrl: { type: Object, required: true }, config: { type: Object, required: true } })
 const auth = useAuthStore()
 const canCreate = () => !props.config.readonly && auth.can(`${props.config.permission}.store`)
+// Vacío: distinto si es por búsqueda/filtro o porque aún no hay registros
+const filtered = () => !!props.ctrl.pagination.search || Object.values(props.ctrl.filters).some((v) => v === true || (v !== '' && v !== false && v != null))
+const emptyText = () => (filtered() ? 'No hay resultados con esta búsqueda o filtro.' : `Aún no hay ${props.config.title.toLowerCase()}.`)
+// En pantallas pequeñas solo se ven la primera columna (nombre/código), el estado y las acciones
+const KEEP = ['name', 'code', 'consecutive', 'username', 'status']
+const colClass = (col, i) => {
+  if (col.hide) return `d-none d-${col.hide}-table-cell`
+  if (i === 0 || col.type === 'status' || KEEP.includes(col.key) || props.config.columns.length <= 3) return ''
+  return 'd-none d-md-table-cell'
+}
 </script>
 
 <template>
@@ -44,15 +54,21 @@ const canCreate = () => !props.config.readonly && auth.can(`${props.config.permi
       </div>
 
       <Skeleton v-if="ctrl.loading" :variant="ctrl.pagination.mode === 'grid' ? 'cards' : 'table'" />
-      <EmptyState v-else-if="!ctrl.items.length" />
+      <EmptyState v-else-if="!ctrl.items.length" :text="emptyText()">
+        <p v-if="!filtered() && canCreate()" class="mb-2 small">Crea {{ config.singular }} para empezar.</p>
+        <Button v-if="!filtered() && canCreate()" :icon="cilPlus" @click="ctrl.goCreate()">Crear {{ config.singular }}</Button>
+        <Button v-else-if="filtered()" color="secondary" variant="outline" @click="ctrl.onSearch('')">Limpiar búsqueda</Button>
+      </EmptyState>
 
-      <!-- Modo tabla -->
-      <CTable v-else-if="ctrl.pagination.mode === 'table'" hover responsive align="middle" class="fade-in">
+      <!-- Modo tabla: encabezado fijo al desplazar -->
+      <div v-else-if="ctrl.pagination.mode === 'table'" class="table-responsive table-sticky-wrap fade-in">
+      <CTable hover align="middle" class="table-sticky mb-0">
         <CTableHead>
           <CTableRow>
             <CTableHeaderCell
-              v-for="col in config.columns"
+              v-for="(col, i) in config.columns"
               :key="col.key"
+              :class="colClass(col, i)"
               :aria-sort="col.sortable && ctrl.pagination.column === col.key ? (ctrl.pagination.dir === 'asc' ? 'ascending' : 'descending') : undefined"
             >
               <button v-if="col.sortable" type="button" class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" @click="ctrl.sortBy(col.key)">
@@ -65,7 +81,7 @@ const canCreate = () => !props.config.readonly && auth.can(`${props.config.permi
         </CTableHead>
         <CTableBody>
           <CTableRow v-for="row in ctrl.items" :key="row.id">
-            <CTableDataCell v-for="(col, i) in config.columns" :key="col.key">
+            <CTableDataCell v-for="(col, i) in config.columns" :key="col.key" :class="colClass(col, i)">
               <slot :name="`cell-${col.key}`" :row="row"><CellValue :row="row" :col="col" /></slot>
               <CBadge v-if="i === 0 && row.deleted_at" color="secondary" class="ms-1">Inactivo</CBadge>
             </CTableDataCell>
@@ -73,6 +89,7 @@ const canCreate = () => !props.config.readonly && auth.can(`${props.config.permi
           </CTableRow>
         </CTableBody>
       </CTable>
+      </div>
 
       <!-- Modo tarjetas -->
       <CRow v-else class="fade-in">
