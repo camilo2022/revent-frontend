@@ -56,7 +56,7 @@ const apply = () => {
         Tallas: <strong>{{ sizes.map((s) => s.size?.name).join(' · ') }}</strong>. Ingresa la proporción de cada talla
         y el total de pares por tienda; el reparto suma exacto.
       </p>
-      <FormField label="Proporción por talla" :error="problem">
+      <FormField label="Proporción por talla" :error="problem" hint="Un número por talla, en orden y separados por coma (ej. 1,2,3,3,2,1). El total se reparte en esa proporción y se ajusta para que sume exacto.">
         <CFormInput v-model="text" placeholder="1,2,3,3,2,1" :invalid="!!problem" />
       </FormField>
       <FormField label="Total de pares por tienda">

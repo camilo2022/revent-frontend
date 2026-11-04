@@ -140,6 +140,7 @@ const save = async () => {
     <CCard class="mb-4">
       <CCardHeader><strong>Especificaciones</strong></CCardHeader>
       <CCardBody>
+        <p class="form-text mt-0 mb-2">Características del producto como pares "nombre: valor". Ej. Material: Cuero sintético · Suela: TR · Altura de tacón: 5 cm. Se imprimen en la ficha y las ve el proveedor.</p>
         <KeyValueEditor v-model="specs" />
         <div v-if="get('specifications')" class="invalid-feedback d-block">{{ get('specifications') }}</div>
       </CCardBody>

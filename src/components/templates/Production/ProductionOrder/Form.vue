@@ -225,17 +225,17 @@ const save = async () => {
         </CRow>
         <CRow>
           <CCol md="4">
-            <FormField label="Fecha de vencimiento" required :error="get('due_date')">
+            <FormField label="Fecha de vencimiento" required :error="get('due_date')" hint="Fecha límite en que el proveedor debe entregar.">
               <CFormInput v-model="form.due_date" type="date" :invalid="!!get('due_date')" />
             </FormField>
           </CCol>
           <CCol md="4">
-            <FormField label="% IVA" required :error="get('vat_percentage')">
+            <FormField label="% IVA" required :error="get('vat_percentage')" hint="Porcentaje del total que se factura con IVA. 100 = toda la orden.">
               <CFormInput v-model="form.vat_percentage" type="number" min="0" :invalid="!!get('vat_percentage')" />
             </FormField>
           </CCol>
           <CCol md="4">
-            <FormField label="% Remisión" required :error="get('delivery_note_percentage')">
+            <FormField label="% Remisión" required :error="get('delivery_note_percentage')" hint="Porcentaje que se entrega por remisión (sin factura). Normalmente 0.">
               <CFormInput v-model="form.delivery_note_percentage" type="number" min="0" :invalid="!!get('delivery_note_percentage')" />
             </FormField>
           </CCol>
