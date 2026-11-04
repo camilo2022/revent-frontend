@@ -1,4 +1,5 @@
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { useOptions } from './useOptions'
 import { useServerErrors } from './useServerErrors'
 import { useAlertStore } from '@/stores/alertStore'
@@ -15,6 +16,7 @@ export function useResourceController({ service, Model, configuration: config, f
   const ui = useUiStore()
   const { options, loadOptions } = useOptions()
   const serverErrors = useServerErrors()
+  const route = useRoute()
 
   const items = ref([])
   const loading = ref(true)
@@ -183,6 +185,10 @@ export function useResourceController({ service, Model, configuration: config, f
 
   onMounted(() => {
     loadOptions(config.optionKeys ?? [])
+    // Enlaces directos desde el Inicio: ?panel=create abre el formulario, ?status=Pendiente filtra la lista
+    const q = route?.query ?? {}
+    if (q.status && 'status' in filters) filters.status = String(q.status)
+    if (q.panel === 'create') goCreate()
     load()
   })
   onBeforeUnmount(() => clearTimeout(timer))
