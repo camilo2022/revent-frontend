@@ -14,6 +14,7 @@ export async function call(request) {
 // Servicio de solo lectura (ubicaciones, auditoría)
 export function readOnlyService(base) {
   return {
+    base,
     all: (params = {}) => call(() => http.get(`${base}/all`, { params })),
     find: (id) => call(() => http.get(`${base}/find/${id}`)),
   }
@@ -22,6 +23,7 @@ export function readOnlyService(base) {
 // Servicio con all/find/store/update/delete/restore; storeForm/updateForm envían multipart
 export function createService(base) {
   return {
+    base,
     ...readOnlyService(base),
     store: (data) => call(() => http.post(`${base}/store`, data)),
     update: (id, data) => call(() => http.put(`${base}/update/${id}`, data)),

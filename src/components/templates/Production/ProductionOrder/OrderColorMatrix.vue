@@ -76,7 +76,7 @@ const copyMatrix = async () => {
   <div>
     <label class="form-label">Tiendas<span class="text-danger" aria-label="obligatorio"> *</span></label>
     <div class="d-flex flex-wrap gap-2 mb-2">
-      <CButton color="primary" variant="outline" size="sm" @click="pickerOpen = true"><CIcon :icon="cilPlus" /> Agregar tiendas</CButton>
+      <CButton color="success" variant="outline" size="sm" @click="pickerOpen = true"><CIcon :icon="cilPlus" /> Agregar tiendas</CButton>
       <CButton color="primary" variant="outline" size="sm" :disabled="!line.stores.length" @click="curveOpen = true">
         <CIcon :icon="cilChartLine" /> Aplicar curva
       </CButton>

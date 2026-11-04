@@ -1,4 +1,5 @@
 <script setup>
+import { cilSave } from '@coreui/icons'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import ProductionOrderService from '@/services/ProductionOrderService'
@@ -20,7 +21,7 @@ import CopyModal from './CopyModal.vue'
 const props = defineProps({ id: [String, Number] })
 const emit = defineEmits(['saved', 'cancel'])
 const { options, loadOptions } = useOptions()
-const { errors, message, get, clear, handle } = useServerErrors()
+const { errors, message, attributes, get, clear, handle } = useServerErrors()
 const route = useRoute()
 // Aviso de cambios sin guardar (cabecera + matrices por color)
 const { mark, confirmLeave } = useUnsavedChanges(() => JSON.stringify({ form, lines }))
@@ -179,8 +180,6 @@ const save = async () => {
     const body = buildPayload()
     const res = props.id ? await ProductionOrderService.update(props.id, body) : await ProductionOrderService.store(body)
     const saved = res.data?.production_order
-    // Mensaje en lenguaje de negocio: "Orden PO-000012 creada"
-    if (saved?.consecutive) notify(`Orden ${saved.consecutive} ${props.id ? 'actualizada' : 'creada'} con ${totals.value.pairs} pares.`)
     mark() // guardado: no preguntar al cerrar
     emit('saved', saved?.id ?? props.id)
   } catch (error) {
@@ -195,7 +194,7 @@ const save = async () => {
 <template>
   <LoadingForm v-if="loading" variant="form" />
   <form v-else @submit.prevent="save">
-    <ErrorSummary :message="message" :errors="errors" />
+    <ErrorSummary :message="message" :errors="errors" :attributes="attributes" />
 
     <CCard class="mb-4">
       <CCardHeader><strong>{{ id ? 'Editar orden de producción' : 'Nueva orden de producción' }}</strong></CCardHeader>
@@ -305,7 +304,7 @@ const save = async () => {
     <RequiredNote />
     <div class="d-flex justify-content-end gap-2 mt-3">
       <CButton color="secondary" variant="outline" @click="confirmLeave().then((ok) => ok && emit('cancel'))">Cancelar</CButton>
-      <CButton type="submit" color="primary" :disabled="saving || !sheet || !totals.pairs"><CSpinner v-if="saving" size="sm" /> Guardar orden</CButton>
+      <CButton type="submit" color="primary" :disabled="saving || !sheet || !totals.pairs"><CSpinner v-if="saving" size="sm" /><CIcon v-else :icon="cilSave" /> Guardar orden</CButton>
     </div>
 
     <CopyModal

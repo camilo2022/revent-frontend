@@ -2,12 +2,13 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
-  cilSpeedometer, cilColorPalette, cilResizeBoth, cilTag, cilLayers, cilBasket,
-  cilDescription, cilIndustry, cilCircle, cilSettings, cilBuilding, cilApplications,
+  cilSpeedometer, cilColorPalette, cilResizeBoth, cilTag, cilLayers, cilBasket, cilDescription, cilIndustry, cilCircle, cilSettings,
+  cilBuilding, cilApplications, cilPeople, cilUser, cilLockLocked, cilShieldAlt, cilList, cilHistory, cilStorage, cilBriefcase,
+  cilMedicalCross, cilHome, cilFile, cilLocationPin, cilSitemap, cilCart, cilOptions,
 } from '@coreui/icons'
 import { useAuthStore } from '@/stores/authStore'
 import { useUiStore } from '@/stores/uiStore'
-import logo from '@/assets/brand/revent-logo.png'
+import logo from '@/assets/brand/revent-logo-white.png'
 
 const auth = useAuthStore()
 const ui = useUiStore()
@@ -16,12 +17,17 @@ const route = useRoute()
 
 // Ícono por ruta del menú
 const icons = {
-  '/colors': cilColorPalette, '/sizes': cilResizeBoth, '/trademarks': cilTag, '/collections': cilLayers,
-  '/products': cilBasket, '/technical_sheets': cilDescription, '/production_orders': cilIndustry,
+  '/collections': cilLayers, '/products': cilBasket, '/technical_sheets': cilDescription, '/production_orders': cilIndustry,
+  '/colors': cilColorPalette, '/sizes': cilResizeBoth, '/trademarks': cilTag, '/categories': cilSitemap, '/subcategories': cilList,
+  '/suppliers': cilStorage, '/stores': cilHome, '/people': cilPeople, '/employees': cilBriefcase, '/areas': cilBuilding, '/positions': cilBriefcase,
+  '/genders': cilPeople, '/blood_types': cilMedicalCross, '/risk_managers': cilShieldAlt, '/health_entities': cilMedicalCross,
+  '/compensation_funds': cilHome, '/pension_funds': cilStorage, '/file_types': cilFile, '/person_types': cilList, '/document_types': cilList,
+  '/locations': cilLocationPin, '/users': cilUser, '/roles': cilShieldAlt, '/permissions': cilLockLocked, '/modules': cilApplications,
 }
 
 // Ícono de cada módulo
-const moduleIcons = { 'Configuración': cilSettings, 'Administración': cilBuilding, 'Producción': cilIndustry }
+const moduleIcons = { 'Producción': cilIndustry, 'Catálogos': cilTag, 'Comercial': cilCart, 'Administración': cilBuilding, 'Parámetros': cilOptions, 'Configuración': cilSettings }
+const order = Object.keys(moduleIcons)
 
 // Un módulo se abre solo si la ruta actual es una de sus páginas
 const isOpen = (group) => group.items.some((i) => route.path === i.url || route.path.startsWith(`${i.url}/`))
@@ -29,25 +35,29 @@ const isOpen = (group) => group.items.some((i) => route.path === i.url || route.
 // Menú de respaldo cuando la API no devuelve navegación
 const item = (name, url, permission) => ({ name, url, permission })
 const fallback = [
-  { name: 'Configuración', items: [
-    item('Usuarios', '/users', 'users.all'), item('Personas', '/people', 'people.all'), item('Empleados', '/employees', 'employees.all'),
-    item('Roles', '/roles', 'authorization.roles.all'), item('Permisos', '/permissions', 'authorization.permissions.all'),
-    item('Módulos', '/modules', 'navegation.modules.all'), item('Auditoría', '/audits', 'audits.all'),
+  { name: 'Producción', items: [
+    item('Colecciones', '/collections', 'collections.all'), item('Productos', '/products', 'products.all'),
+    item('Fichas técnicas', '/technical_sheets', 'technical_sheets.all'), item('Órdenes de producción', '/production_orders', 'production_orders.all'),
   ] },
+  { name: 'Catálogos', items: [
+    item('Colores', '/colors', 'colors.all'), item('Tallas', '/sizes', 'sizes.all'), item('Marcas', '/trademarks', 'trademarks.all'),
+    item('Categorías', '/categories', 'classification.categories.all'), item('Subcategorías', '/subcategories', 'classification.subcategories.all'),
+  ] },
+  { name: 'Comercial', items: [item('Proveedores', '/suppliers', 'suppliers.all'), item('Tiendas', '/stores', 'stores.all')] },
   { name: 'Administración', items: [
+    item('Personas', '/people', 'people.all'), item('Empleados', '/employees', 'employees.all'),
     item('Áreas', '/areas', 'organizational_structure.areas.all'), item('Cargos', '/positions', 'organizational_structure.areas.positions.all'),
+  ] },
+  { name: 'Parámetros', items: [
     item('Géneros', '/genders', 'genders.all'), item('Tipos de sangre', '/blood_types', 'blood_types.all'),
     item('Administradoras de riesgos', '/risk_managers', 'risk_managers.all'), item('Entidades de salud', '/health_entities', 'health_entities.all'),
     item('Cajas de compensación', '/compensation_funds', 'compensation_funds.all'), item('Fondos de pensión', '/pension_funds', 'pension_funds.all'),
     item('Tipos de archivo', '/file_types', 'file_types.all'), item('Tipos de persona', '/person_types', 'identification.person_types.all'),
-    item('Tipos de documento', '/document_types', 'identification.document_types.all'), item('Ubicaciones', '/locations', ''),
+    item('Tipos de documento', '/document_types', 'identification.document_types.all'),
   ] },
-  { name: 'Producción', items: [
-    item('Colecciones', '/collections', 'collections.all'), item('Productos', '/products', 'products.all'),
-    item('Fichas técnicas', '/technical_sheets', 'technical_sheets.all'), item('Órdenes de producción', '/production_orders', 'production_orders.all'),
-    item('Colores', '/colors', 'colors.all'), item('Tallas', '/sizes', 'sizes.all'), item('Marcas', '/trademarks', 'trademarks.all'),
-    item('Categorías', '/categories', 'classification.categories.all'), item('Subcategorías', '/subcategories', 'classification.subcategories.all'),
-    item('Proveedores', '/suppliers', 'suppliers.all'), item('Tiendas', '/stores', 'stores.all'),
+  { name: 'Configuración', items: [
+    item('Usuarios', '/users', 'users.all'), item('Roles', '/roles', 'authorization.roles.all'), item('Permisos', '/permissions', 'authorization.permissions.all'),
+    item('Módulos', '/modules', 'navegation.modules.all'),
   ] },
 ]
 
@@ -61,7 +71,8 @@ const groups = computed(() => {
       items: (m.submodules ?? []).filter((s) => routeExists(s.url)).map((s) => ({ name: s.name, url: s.url })),
     }))
     .filter((g) => g.items.length)
-  if (dynamic.length) return dynamic
+  const rank = (n) => (order.includes(n) ? order.indexOf(n) : order.length)
+  if (dynamic.length) return dynamic.sort((a, b) => rank(a.name) - rank(b.name))
 
   return fallback
     .map((g) => ({ name: g.name, items: g.items.filter((i) => auth.can(i.permission)) }))
@@ -80,7 +91,7 @@ const groups = computed(() => {
   >
     <CSidebarHeader class="border-bottom">
       <CSidebarBrand to="/" class="gap-2">
-        <span class="brand-logo"><img :src="logo" alt="Revent" class="brand-logo-img" /></span>
+        <img :src="logo" alt="Revent" class="brand-logo-img" />
       </CSidebarBrand>
     </CSidebarHeader>
 

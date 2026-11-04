@@ -1,4 +1,5 @@
 <script setup>
+import { cilSave } from '@coreui/icons'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ProductService from '@/services/ProductService'
@@ -17,7 +18,7 @@ import ColorSizeEditor from './ColorSizeEditor.vue'
 const props = defineProps({ id: [String, Number] })
 const emit = defineEmits(['saved', 'cancel'])
 const { options, loadOptions } = useOptions()
-const { errors, message, get, clear, handle } = useServerErrors()
+const { errors, message, attributes, get, clear, handle } = useServerErrors()
 const { can } = usePermissions()
 const router = useRouter()
 
@@ -76,7 +77,6 @@ const save = async () => {
   try {
     const res = props.id ? await ProductService.update(props.id, body) : await ProductService.store(body)
     const saved = res.data?.product
-    if (saved?.code) notify(`Producto ${saved.code} · ${saved.name} ${props.id ? 'actualizado' : 'creado'}.`)
     mark() // guardado: no preguntar al cerrar
     emit('saved', saved?.id ?? props.id)
     // Siguiente paso: la ficha técnica (solo al crear y si tiene permiso)
@@ -100,7 +100,7 @@ const save = async () => {
 <template>
   <LoadingForm v-if="loading" variant="form" />
   <form v-else @submit.prevent="save">
-    <ErrorSummary :message="message" :errors="errors" />
+    <ErrorSummary :message="message" :errors="errors" :attributes="attributes" />
 
     <CCard class="mb-4">
       <CCardHeader><strong>{{ id ? `Editar producto ${product?.code ?? ''}` : 'Nuevo producto' }}</strong></CCardHeader>
@@ -149,7 +149,7 @@ const save = async () => {
     <RequiredNote />
     <div class="d-flex justify-content-end gap-2 mt-3">
       <CButton color="secondary" variant="outline" @click="confirmLeave().then((ok) => ok && emit('cancel'))">Cancelar</CButton>
-      <CButton type="submit" color="primary" :disabled="saving"><CSpinner v-if="saving" size="sm" /> Guardar</CButton>
+      <CButton type="submit" color="primary" :disabled="saving"><CSpinner v-if="saving" size="sm" /><CIcon v-else :icon="cilSave" /> Guardar</CButton>
     </div>
   </form>
 </template>

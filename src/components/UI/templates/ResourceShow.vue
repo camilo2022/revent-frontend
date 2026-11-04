@@ -1,11 +1,14 @@
 <script setup>
-import { cilPencil } from '@coreui/icons'
+import { ref } from 'vue'
+import { cilHistory, cilPencil } from '@coreui/icons'
+import AuditTimeline from './AuditTimeline.vue'
 import { useAuthStore } from '@/stores/authStore'
 import Button from './Button.vue'
 
 // Detalle de solo lectura según config.show
 const props = defineProps({ ctrl: { type: Object, required: true }, config: { type: Object, required: true } })
 const auth = useAuthStore()
+const auditOpen = ref(false)
 const text = (v) => (v === null || v === undefined || v === '' ? '-' : v)
 const canEdit = () => !props.config.readonly && auth.can(`${props.config.permission}.update`)
 </script>
@@ -16,7 +19,9 @@ const canEdit = () => !props.config.readonly && auth.can(`${props.config.permiss
       <strong>Detalle de {{ config.singular }}</strong>
       <div class="d-flex gap-2">
         <Button color="secondary" variant="outline" size="sm" @click="ctrl.goIndex()">Volver</Button>
-        <Button v-if="canEdit()" size="sm" :icon="cilPencil" @click="ctrl.goEdit(ctrl.current)">Editar</Button>
+        <Button v-if="!config.readonly" :permission="`${config.permission}.update`" variant="outline" size="sm" :icon="cilPencil" @click="ctrl.goEdit(ctrl.current)">Editar</Button>
+        <Button v-if="ctrl.service?.base" permission="audits.find" color="secondary" variant="outline" size="sm" :icon="cilHistory" @click="auditOpen = true">Auditoría</Button>
+        <AuditTimeline v-if="auditOpen" :base="ctrl.service.base" :id="ctrl.current.id" @close="auditOpen = false" />
       </div>
     </CCardHeader>
     <CCardBody>

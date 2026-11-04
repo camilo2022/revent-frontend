@@ -2,6 +2,7 @@
 import { watch } from 'vue'
 import Swal from 'sweetalert2'
 import { useSwalStore } from '@/stores/swalStore'
+import { useAlertStore } from '@/stores/alertStore'
 
 // Muestra con SweetAlert2 lo que pida el swalStore y devuelve la respuesta
 const store = useSwalStore()
@@ -22,6 +23,7 @@ watch(
       focusCancel: data.icon === 'warning',
       customClass: { popup: 'swal-revent' },
     })
+    if (!result.isConfirmed) useAlertStore().warning('Acción cancelada.')
     store.resolveSwal(result.isConfirmed)
   },
 )

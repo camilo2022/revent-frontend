@@ -1,4 +1,8 @@
 <script setup>
+import { cilHistory } from '@coreui/icons'
+import AuditTimeline from '@/components/UI/templates/AuditTimeline.vue'
+import { cilCheckAlt, cilBan } from '@coreui/icons'
+import { cilArrowLeft } from '@coreui/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import { cilPencil } from '@coreui/icons'
 import ProductionOrderService from '@/services/ProductionOrderService'
@@ -11,6 +15,7 @@ import OrderDetailMatrix from './OrderDetailMatrix.vue'
 
 const props = defineProps({ id: [String, Number] })
 const { can } = usePermissions()
+const auditOpen = ref(false)
 const emit = defineEmits(['edit', 'back'])
 const order = ref(null)
 const busy = ref(false)
@@ -27,6 +32,7 @@ onMounted(load)
 watch(() => props.id, load)
 
 // Aprobar y cancelar según estado y permiso
+const actionIcons = { reviewed: cilSend, approved: cilCheckAlt, canceled: cilBan }
 const actions = computed(() =>
   [
     { key: 'approved', label: 'Aprobar', color: 'success', permission: 'production_orders.approved', when: ['Pendiente'], text: 'La orden quedará aprobada y ya no se podrá editar.' },
@@ -39,7 +45,6 @@ const run = async (action) => {
   busy.value = true
   try {
     order.value = (await ProductionOrderService[action.key](order.value.id)).data.production_order
-    notify('Acción realizada')
   } catch (error) {
     notifyError(errorMessage(error))
   } finally {
@@ -51,13 +56,15 @@ const run = async (action) => {
 <template>
   <LoadingForm v-if="!order" variant="form" />
   <template v-else>
+    <AuditTimeline v-if="auditOpen" base="/production_orders" :id="order.id" :title="order.consecutive" @close="auditOpen = false" />
     <CCard class="mb-4">
       <CCardHeader class="d-flex flex-wrap justify-content-between align-items-center gap-2">
         <strong>Orden {{ order.consecutive }} <StatusBadge :status="order.status" class="ms-2" /></strong>
         <div class="d-flex gap-2">
-          <CButton color="secondary" variant="outline" size="sm" @click="emit('back')">Volver</CButton>
+          <CButton color="secondary" variant="outline" size="sm" @click="emit('back')"><CIcon :icon="cilArrowLeft" /> Volver</CButton>
           <CButton v-if="can('production_orders.update') && order.status === 'Pendiente'" color="primary" variant="outline" size="sm" @click="emit('edit')"><CIcon :icon="cilPencil" /> Editar</CButton>
-          <CButton v-for="a in actions" :key="a.key" :color="a.color" size="sm" :disabled="busy" @click="run(a)">{{ a.label }}</CButton>
+          <CButton :disabled="!can('audits.find')" color="secondary" variant="outline" size="sm" :title="can('audits.find') ? 'Auditoría del registro' : 'No tienes permiso para esta acción'" @click="auditOpen = true"><CIcon :icon="cilHistory" /> Auditoría</CButton>
+          <CButton v-for="a in actions" :key="a.key" :color="a.color" size="sm" :disabled="busy" @click="run(a)"><CIcon :icon="actionIcons[a.key]" /> {{ a.label }}</CButton>
         </div>
       </CCardHeader>
       <CCardBody>

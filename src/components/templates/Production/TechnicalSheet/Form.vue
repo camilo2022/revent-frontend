@@ -1,4 +1,5 @@
 <script setup>
+import { cilSave } from '@coreui/icons'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import TechnicalSheetService from '@/services/TechnicalSheetService'
@@ -16,7 +17,7 @@ import KeyValueEditor from '@/components/UI/templates/KeyValueEditor.vue'
 const props = defineProps({ id: [String, Number] })
 const emit = defineEmits(['saved', 'cancel'])
 const { options, loadOptions } = useOptions()
-const { errors, message, get, clear, handle } = useServerErrors()
+const { errors, message, attributes, get, clear, handle } = useServerErrors()
 const route = useRoute()
 // Aviso de cambios sin guardar (campos + especificaciones)
 const { mark, confirmLeave } = useUnsavedChanges(() => JSON.stringify({ form, specs: specs.value }))
@@ -92,7 +93,7 @@ const save = async () => {
 <template>
   <LoadingForm v-if="loading" variant="form" />
   <form v-else @submit.prevent="save">
-    <ErrorSummary :message="message" :errors="errors" />
+    <ErrorSummary :message="message" :errors="errors" :attributes="attributes" />
 
     <CCard class="mb-4">
       <CCardHeader><strong>{{ id ? 'Editar ficha técnica' : 'Nueva ficha técnica' }}</strong></CCardHeader>
@@ -154,7 +155,7 @@ const save = async () => {
     <RequiredNote />
     <div class="d-flex justify-content-end gap-2 mt-3">
       <CButton color="secondary" variant="outline" @click="confirmLeave().then((ok) => ok && emit('cancel'))">Cancelar</CButton>
-      <CButton type="submit" color="primary" :disabled="saving"><CSpinner v-if="saving" size="sm" /> Guardar</CButton>
+      <CButton type="submit" color="primary" :disabled="saving"><CSpinner v-if="saving" size="sm" /><CIcon v-else :icon="cilSave" /> Guardar</CButton>
     </div>
   </form>
 </template>

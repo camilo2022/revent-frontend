@@ -1,4 +1,7 @@
 <script setup>
+import { cilHistory } from '@coreui/icons'
+import AuditTimeline from '@/components/UI/templates/AuditTimeline.vue'
+import { cilArrowLeft } from '@coreui/icons'
 import { onMounted, ref } from 'vue'
 import { cilPencil } from '@coreui/icons'
 import ProductService from '@/services/ProductService'
@@ -11,6 +14,7 @@ import ProductColors from './ProductColors.vue'
 
 const props = defineProps({ id: [String, Number] })
 const { can } = usePermissions()
+const auditOpen = ref(false)
 const emit = defineEmits(['edit', 'back'])
 const { handle } = useServerErrors()
 const product = ref(null)
@@ -27,12 +31,14 @@ onMounted(async () => {
 <template>
   <LoadingForm v-if="!product" variant="form" />
   <template v-else>
+    <AuditTimeline v-if="auditOpen" base="/products" :id="product.id" :title="`${product.code} · ${product.name}`" @close="auditOpen = false" />
     <CCard class="mb-4">
       <CCardHeader class="d-flex justify-content-between align-items-center">
         <strong>{{ product.code }} · {{ product.name }}</strong>
         <div class="d-flex gap-2">
-          <CButton color="secondary" variant="outline" size="sm" @click="emit('back')">Volver</CButton>
-          <CButton v-if="can('products.update')" color="primary" size="sm" @click="emit('edit')"><CIcon :icon="cilPencil" /> Editar</CButton>
+          <CButton color="secondary" variant="outline" size="sm" @click="emit('back')"><CIcon :icon="cilArrowLeft" /> Volver</CButton>
+          <CButton v-if="can('products.update')" color="primary" variant="outline" size="sm" @click="emit('edit')"><CIcon :icon="cilPencil" /> Editar</CButton>
+          <CButton :disabled="!can('audits.find')" color="secondary" variant="outline" size="sm" :title="can('audits.find') ? 'Auditoría del registro' : 'No tienes permiso para esta acción'" @click="auditOpen = true"><CIcon :icon="cilHistory" /> Auditoría</CButton>
         </div>
       </CCardHeader>
       <CCardBody>

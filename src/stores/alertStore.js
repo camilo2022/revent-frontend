@@ -4,6 +4,7 @@ import { ref } from 'vue'
 // Alertas flotantes (type: success | danger | warning | info)
 export const useAlertStore = defineStore('alertStore', () => {
   const alerts = ref([])
+  const muted = ref(false) // los procesos con varias llamadas avisan una sola vez al final
 
   const removeAlert = (id) => {
     alerts.value = alerts.value.filter((a) => a.id !== id)
@@ -17,7 +18,8 @@ export const useAlertStore = defineStore('alertStore', () => {
 
   // Atajos comunes
   const success = (message) => addAlert({ type: 'success', message })
+  const warning = (message) => addAlert({ type: 'warning', message })
   const error = (message) => addAlert({ type: 'danger', message, duration: 7000 })
 
-  return { alerts, addAlert, removeAlert, success, error }
+  return { alerts, muted, addAlert, removeAlert, success, warning, error }
 })

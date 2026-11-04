@@ -57,7 +57,7 @@ const sizeCode = (item, s) => {
         <option value="">Selecciona un color...</option>
         <option v-for="c in available" :key="c.id" :value="c.id">{{ c.name }} ({{ c.settings?.code }})</option>
       </CFormSelect>
-      <CButton color="primary" variant="outline" :disabled="!newColor" @click="addColor"><CIcon :icon="cilPlus" /> Agregar color</CButton>
+      <CButton color="success" variant="outline" :disabled="!newColor" @click="addColor"><CIcon :icon="cilPlus" /> Agregar color</CButton>
     </div>
     <p class="form-text mt-0 mb-3">Agrega cada color del producto y marca las tallas en las que se fabricará. Haz clic en una talla para marcarla o desmarcarla.</p>
 

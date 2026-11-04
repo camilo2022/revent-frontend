@@ -1,3 +1,7 @@
-import { readOnlyService } from './BaseService'
+import http from '@/config/http'
+import { call } from './BaseService'
 
-export default readOnlyService('/audits')
+// Historial de un registro: GET /{módulo}/audits/{id}
+export default {
+  record: (base, id, params = {}) => call(() => http.get(`${base}/audits/${id}`, { params })),
+}

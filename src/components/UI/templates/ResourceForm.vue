@@ -15,7 +15,7 @@ const cols = (f) => (['textarea', 'location'].includes(f.type) ? 12 : 6)
 
 <template>
   <form novalidate @submit.prevent="ctrl.save()">
-    <ErrorSummary :message="ctrl.message" :errors="ctrl.errors" />
+    <ErrorSummary :message="ctrl.message" :errors="ctrl.errors" :attributes="ctrl.attributes" />
     <CRow>
       <CCol v-for="f in config.fields" :key="f.key" :md="config.formMode === 'modal' ? 12 : cols(f)">
         <FieldInput :field="f" :form="ctrl.form" :entity="ctrl.current" :options="ctrl.options" :get="ctrl.getError" :is-edit="isEdit" :autofocus="f === config.fields[0]" />

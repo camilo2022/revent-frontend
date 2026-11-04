@@ -1,4 +1,5 @@
 <script setup>
+import { cilArrowLeft } from '@coreui/icons'
 import View from '@/components/templates/Setting/Submodule/Submodule.vue'
 import { configuration } from '@/components/templates/Setting/Submodule/configuration.vue'
 import Model from '@/models/Submodule'
@@ -15,7 +16,7 @@ const ctrl = useResourceController({ service: Service, Model, configuration, fix
 <template>
   <div>
     <div class="d-flex align-items-center gap-3 mb-3">
-      <CButton color="secondary" variant="outline" size="sm" @click="$emit('back')">&larr; Módulos</CButton>
+      <CButton color="secondary" variant="outline" size="sm" @click="$emit('back')"><CIcon :icon="cilArrowLeft" /> Módulos</CButton>
       <h5 class="mb-0">Módulo: {{ module.name }}</h5>
     </div>
     <View :ctrl="ctrl" />

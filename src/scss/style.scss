@@ -61,6 +61,12 @@ body {
 .footer { min-height: calc(3rem + 1px); }
 .sidebar-nav .nav-icon { display: inline-flex; align-items: center; justify-content: center; }
 .card-header { font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--kanri-navy); }
+// Flecha roja antes del título, como en Kanri
+.card-header > strong:first-child::before, .card-header > h5:first-child::before {
+  content: ''; display: inline-block; margin-right: .5rem; vertical-align: middle;
+  border-left: 8px solid #c21111; border-block: 6px solid transparent;
+}
+.sidebar-brand .brand-logo-img { max-height: 30px; }
 [data-coreui-theme='dark'] .card-header { color: #a5b4fc; }
 
 .card {
@@ -144,3 +150,14 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .fade-in, .skeleton, .panel-enter-active, .panel-leave-active, .alert-slide-enter-active, .alert-slide-leave-active { animation: none; transition: none; }
 }
+
+// Línea de tiempo del historial (estilo AdminLTE)
+.timeline { position: relative; margin: 0 0 1rem; padding: 0; }
+.timeline::before { content: ''; position: absolute; top: 0; bottom: 0; left: 18px; width: 3px; background: var(--cui-border-color); border-radius: 2px; }
+.timeline-day { position: relative; margin: 0 0 1rem 0; }
+.timeline-day .badge { font-size: .8rem; padding: .4rem .7rem; }
+.timeline-item { position: relative; margin: 0 0 1rem 0; padding-left: 52px; }
+.timeline-icon { position: absolute; left: 0; top: 0; width: 38px; height: 38px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+.timeline-card { background: var(--cui-tertiary-bg); border: 1px solid var(--cui-border-color); border-radius: .5rem; padding: .6rem .85rem; }
+.timeline-head { border-bottom: 1px solid var(--cui-border-color); padding-bottom: .35rem; margin-bottom: .35rem; }
+.timeline-meta { display: flex; flex-wrap: wrap; gap: .25rem 1rem; }

@@ -9,9 +9,9 @@ const visible = computed(() => auth.can(props.permission))
 </script>
 
 <template>
-  <CButton v-if="visible" :color="color" v-bind="$attrs" :disabled="loading || $attrs.disabled">
+  <CButton :color="color" v-bind="$attrs" :disabled="loading || $attrs.disabled || !visible" :title="visible ? $attrs.title : 'No tienes permiso para esta acción'">
     <CSpinner v-if="loading" size="sm" class="me-1" />
-    <CIcon v-else-if="icon" :icon="icon" class="me-1" />
+    <CIcon v-else-if="icon" :icon="icon" :class="{ 'me-1': $slots.default }" />
     <slot />
   </CButton>
 </template>

@@ -1,4 +1,5 @@
 <script setup>
+import { cilCheckAlt, cilX } from '@coreui/icons'
 import { computed, ref, watch } from 'vue'
 import { distributeCurve, parseProportions } from '@/utils/orderMatrix'
 import FormField from '@/components/UI/templates/FormField.vue'
@@ -74,8 +75,8 @@ const apply = () => {
       </div>
     </CModalBody>
     <CModalFooter>
-      <CButton color="secondary" variant="outline" @click="emit('close')">Cancelar</CButton>
-      <CButton color="primary" :disabled="!valid" @click="apply">Aplicar</CButton>
+      <CButton color="secondary" variant="outline" @click="emit('close')"><CIcon :icon="cilX" /> Cancelar</CButton>
+      <CButton color="primary" :disabled="!valid" @click="apply"><CIcon :icon="cilCheckAlt" /> Aplicar</CButton>
     </CModalFooter>
   </CModal>
 </template>

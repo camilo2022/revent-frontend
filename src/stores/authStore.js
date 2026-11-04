@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import AuthService from '@/services/AuthService'
+import { readToken, removeToken, saveToken } from '@/utils/cookies'
 
-// Sesión: usuario y token se guardan en localStorage (persistedstate)
+// Sesión: el token vive en una cookie y el usuario en localStorage (persistedstate)
 export const useAuthStore = defineStore(
   'authStore',
   () => {
     const user = ref(null)
-    const token = ref(null)
+    const token = ref(readToken())
     const navegation = ref([])
     const loaded = ref(false) // true cuando ya se consultó /auth/user
 
@@ -24,6 +25,7 @@ export const useAuthStore = defineStore(
       const res = await AuthService.login(credentials)
       user.value = res.data.user
       token.value = res.data.token
+      saveToken(res.data.token)
       await fetchUser()
     }
 
@@ -38,6 +40,7 @@ export const useAuthStore = defineStore(
     const clear = () => {
       user.value = null
       token.value = null
+      removeToken()
       navegation.value = []
       loaded.value = false
     }
@@ -53,5 +56,5 @@ export const useAuthStore = defineStore(
 
     return { user, token, navegation, loaded, permissions, userName, can, login, fetchUser, logout, clear }
   },
-  { persist: { pick: ['user', 'token'] } },
+  { persist: { pick: ['user'] } },
 )

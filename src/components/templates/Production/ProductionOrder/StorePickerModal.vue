@@ -1,4 +1,6 @@
 <script setup>
+import { cilBan, cilCheckAlt } from '@coreui/icons'
+import { cilX } from '@coreui/icons'
 import { computed, ref, watch } from 'vue'
 
 // Selección múltiple de tiendas; `selected` son las ya agregadas (no se pueden repetir)
@@ -40,7 +42,7 @@ const toggleAll = () => {
     <CModalBody>
       <CFormInput v-model="search" placeholder="Buscar tienda..." class="mb-2" />
       <CButton color="link" size="sm" class="px-0 mb-2" @click="toggleAll">
-        {{ checked.length === list.length && list.length ? 'Quitar selección' : 'Seleccionar todas' }}
+        <CIcon :icon="checked.length === list.length && list.length ? cilBan : cilCheckAlt" /> {{ checked.length === list.length && list.length ? 'Quitar selección' : 'Seleccionar todas' }}
       </CButton>
       <p v-if="!list.length" class="text-body-secondary">No hay tiendas disponibles.</p>
       <CFormCheck
@@ -53,8 +55,8 @@ const toggleAll = () => {
       />
     </CModalBody>
     <CModalFooter>
-      <CButton color="secondary" variant="outline" @click="emit('close')">Cancelar</CButton>
-      <CButton color="primary" :disabled="!checked.length" @click="emit('confirm', checked)">Agregar ({{ checked.length }})</CButton>
+      <CButton color="secondary" variant="outline" @click="emit('close')"><CIcon :icon="cilX" /> Cancelar</CButton>
+      <CButton color="success" :disabled="!checked.length" @click="emit('confirm', checked)">Agregar ({{ checked.length }})</CButton>
     </CModalFooter>
   </CModal>
 </template>

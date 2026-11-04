@@ -34,7 +34,7 @@ export function useResourceController({ service, Model, configuration: config, f
   })
   // Filtros: with_trashed + los de la configuración (siempre 1/0 para Laravel)
   const filters = reactive({
-    ...(config.withTrashed ? { with_trashed: false } : {}),
+    ...(config.withTrashed ? { with_trashed: true } : {}),
     ...Object.fromEntries((config.filters ?? []).map((f) => [f.key, false])),
     ...(config.valueFilters ?? {}),
   })
@@ -43,7 +43,8 @@ export function useResourceController({ service, Model, configuration: config, f
     const p = { page: pagination.current_page, per_page: pagination.per_page, column: pagination.column, dir: pagination.dir, ...fixed() }
     if (pagination.search && !config.noSearch) p.search = pagination.search
     Object.entries(filters).forEach(([k, v]) => {
-      if (v === true || v === false) p[k] = v ? 1 : 0
+      // Un filtro apagado no se envía (para el backend 0 significaría "solo los que no")
+      if (v === true || v === false) { if (v || k === 'with_trashed') p[k] = v ? 1 : 0 }
       else if (v !== '' && v !== null && v !== undefined) p[k] = v
     })
     return p
@@ -119,7 +120,6 @@ export function useResourceController({ service, Model, configuration: config, f
   }
   // Tras guardar en un formulario propio
   const saved = (quiet = false) => {
-    if (!quiet) alerts.success('Guardado correctamente') // los formularios propios ya avisan con el nombre del registro
     goIndex()
     load()
   }
@@ -164,7 +164,6 @@ export function useResourceController({ service, Model, configuration: config, f
     if (!(await swal.confirm({ title, text: row.name ?? row.username ?? '', icon: 'warning', confirmText: 'Sí, continuar' }))) return
     try {
       await service[fn](row.id)
-      alerts.success(done)
       load()
     } catch (error) {
       serverErrors.handle(error)
@@ -215,8 +214,8 @@ export function useResourceController({ service, Model, configuration: config, f
   })
 
   return reactive({
-    items, loading, saving, mode, current, form, pagination, filters, options, loadOptions,
-    errors: serverErrors.errors, message: serverErrors.message, getError: serverErrors.get,
+    service, items, loading, saving, mode, current, form, pagination, filters, options, loadOptions,
+    errors: serverErrors.errors, message: serverErrors.message, attributes: serverErrors.attributes, getError: serverErrors.get,
     clearErrors: serverErrors.clear, handleError: serverErrors.handle,
     load, goIndex, goCreate, goEdit, goShow, goPanel, saved, save, remove, restore,
     setPage, refresh, onSearch, onPerPage, sortBy, setMode,

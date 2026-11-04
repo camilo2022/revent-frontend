@@ -6,10 +6,12 @@ import { errorMessage } from '@/utils/format'
 export function useServerErrors() {
   const errors = ref({})
   const message = ref('')
+  const attributes = ref({}) // nombre legible de cada campo, como lo manda el backend
 
   const clear = () => {
     errors.value = {}
     message.value = ''
+    attributes.value = {}
   }
 
   // Primer mensaje de un campo
@@ -20,12 +22,14 @@ export function useServerErrors() {
     clear()
     if (error?.errors) {
       errors.value = error.errors
+      attributes.value = error.attributes ?? {}
       message.value = error.message ?? 'Error de validación.'
+      useAlertStore().warning('Revisa los campos marcados en rojo.')
     } else {
       message.value = errorMessage(error)
       if (alert) useAlertStore().error(message.value)
     }
   }
 
-  return { errors, message, get, clear, handle }
+  return { errors, message, attributes, get, clear, handle }
 }

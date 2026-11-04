@@ -6,7 +6,7 @@ const resources = {
   Setting: {
     users: ['User', 'Usuarios', 'users.all'], people: ['Person', 'Personas', 'people.all'], employees: ['Employee', 'Empleados', 'employees.all'],
     roles: ['Role', 'Roles', 'authorization.roles.all'], permissions: ['Permission', 'Permisos', 'authorization.permissions.all'],
-    modules: ['Module', 'Módulos', 'navegation.modules.all'], audits: ['Audit', 'Auditoría', 'audits.all'],
+    modules: ['Module', 'Módulos', 'navegation.modules.all'],
   },
   Administration: {
     areas: ['Area', 'Áreas', 'organizational_structure.areas.all'], positions: ['Position', 'Cargos', 'organizational_structure.areas.positions.all'],
@@ -44,7 +44,7 @@ const router = createRouter({
   routes: [
     { path: '/login', name: 'login', component: () => import('@/pages/Login.vue'), meta: { public: true } },
     { path: '/', component: () => import('@/components/layout/DefaultLayout.vue'), children },
-    errorPage(403), errorPage(404), errorPage(500),
+    errorPage(401), errorPage(403), errorPage(404), errorPage(500),
     { path: '/:pathMatch(.*)*', redirect: '/404' },
   ],
   scrollBehavior: () => ({ top: 0 }),
@@ -54,7 +54,7 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
   if (to.meta.public) return to.path === '/login' && auth.token ? '/' : true
-  if (!auth.token) return '/login'
+  if (!auth.token) return '/401'
 
   // Carga usuario, permisos y menú una vez por recarga de página
   if (!auth.loaded) {

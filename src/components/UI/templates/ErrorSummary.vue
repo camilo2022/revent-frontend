@@ -1,16 +1,21 @@
 <script setup>
 import { computed } from 'vue'
+import { cilWarning } from '@coreui/icons'
 
-// Resumen de errores del servidor (mensaje general + todos los detalles)
-const props = defineProps({ message: String, errors: { type: Object, default: () => ({}) } })
-const list = computed(() => [...new Set(Object.values(props.errors).flat())])
+// Los errores de validación se ven en cada campo (borde rojo + ícono). Aquí solo se listan los de filas
+// anidadas (por ejemplo, una cantidad de la matriz), que no tienen un campo propio donde dibujarse.
+const props = defineProps({ message: String, errors: { type: Object, default: () => ({}) }, attributes: { type: Object, default: () => ({}) } })
+
+const label = (key) => props.attributes[key] ?? props.attributes[key.replace(/[.][0-9]+[.]/g, '.*.')] ?? ''
+const list = computed(() =>
+  Object.entries(props.errors)
+    .filter(([key]) => /[.][0-9]+[.]/.test(key))
+    .flatMap(([key, msgs]) => msgs.map((m) => (label(key) ? `${label(key)}: ${m}` : m))),
+)
 </script>
 
 <template>
-  <CAlert v-if="message || list.length" color="danger" class="mb-3">
-    <div v-if="message" class="fw-semibold">{{ message }}</div>
-    <ul class="mb-0 ps-3">
-      <li v-for="e in list" :key="e">{{ e }}</li>
-    </ul>
-  </CAlert>
+  <ul v-if="list.length" class="list-unstyled small text-danger mb-3">
+    <li v-for="e in list" :key="e" class="d-flex align-items-center gap-1"><CIcon :icon="cilWarning" size="sm" /> {{ e }}</li>
+  </ul>
 </template>

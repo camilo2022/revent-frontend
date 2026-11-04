@@ -15,6 +15,6 @@ const remove = (i) => model.value.splice(i, 1)
       <CFormInput v-model="row.value" placeholder="Valor" />
       <CButton color="danger" variant="outline" @click="remove(i)"><CIcon :icon="cilTrash" /></CButton>
     </div>
-    <CButton color="primary" variant="outline" size="sm" @click="add"><CIcon :icon="cilPlus" /> Agregar característica</CButton>
+    <CButton color="success" variant="outline" size="sm" @click="add"><CIcon :icon="cilPlus" /> Agregar característica</CButton>
   </div>
 </template>

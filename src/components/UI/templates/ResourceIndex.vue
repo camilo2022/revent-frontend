@@ -11,9 +11,10 @@ import Skeleton from './Skeleton.vue'
 // Lista genérica: búsqueda, filtros, orden, modo tabla/tarjetas, esqueleto, vacío y paginación
 const props = defineProps({ ctrl: { type: Object, required: true }, config: { type: Object, required: true } })
 const auth = useAuthStore()
-const canCreate = () => !props.config.readonly && auth.can(`${props.config.permission}.store`)
+const showCreate = () => !props.config.readonly
+const canCreate = () => auth.can(`${props.config.permission}.store`)
 // Vacío: distinto si es por búsqueda/filtro o porque aún no hay registros
-const filtered = () => !!props.ctrl.pagination.search || Object.values(props.ctrl.filters).some((v) => v === true || (v !== '' && v !== false && v != null))
+const filtered = () => !!props.ctrl.pagination.search || Object.entries(props.ctrl.filters).some(([k, v]) => k !== 'with_trashed' && (v === true || (v !== '' && v !== false && v != null)))
 const emptyText = () => (filtered() ? 'No hay resultados con esta búsqueda o filtro.' : `Aún no hay ${props.config.title.toLowerCase()}.`)
 // En pantallas pequeñas solo se ven la primera columna (nombre/código), el estado y las acciones
 const KEEP = ['name', 'code', 'consecutive', 'username', 'status']
@@ -29,7 +30,7 @@ const colClass = (col, i) => {
     <CCardHeader class="d-flex justify-content-between align-items-center">
       <strong>{{ config.title }}</strong>
       <slot name="header-actions">
-        <Button v-if="canCreate()" size="sm" :icon="cilPlus" @click="ctrl.goCreate()">Nuevo</Button>
+        <Button v-if="showCreate()" :permission="`${config.permission}.store`" color="success" size="sm" variant="outline" :icon="cilPlus" :title="`Nuevo ${config.singular}`" :aria-label="`Nuevo ${config.singular}`" @click="ctrl.goCreate()" />
       </slot>
     </CCardHeader>
     <CCardBody>
@@ -45,7 +46,6 @@ const colClass = (col, i) => {
           @update:model-value="ctrl.onSearch"
         />
         <slot name="filters" />
-        <CFormSwitch v-if="config.withTrashed" v-model="ctrl.filters.with_trashed" label="Ver inactivos" @change="ctrl.refresh()" />
         <CFormSwitch v-for="f in config.filters" :key="f.key" v-model="ctrl.filters[f.key]" :label="f.label" @change="ctrl.refresh()" />
         <CButtonGroup class="ms-auto" size="sm" role="group" aria-label="Modo de vista">
           <CButton :color="ctrl.pagination.mode === 'table' ? 'primary' : 'secondary'" variant="outline" title="Tabla" aria-label="Ver como tabla" @click="ctrl.setMode('table')"><CIcon :icon="cilList" /></CButton>
@@ -56,7 +56,7 @@ const colClass = (col, i) => {
       <Skeleton v-if="ctrl.loading" :variant="ctrl.pagination.mode === 'grid' ? 'cards' : 'table'" />
       <EmptyState v-else-if="!ctrl.items.length" :text="emptyText()">
         <p v-if="!filtered() && canCreate()" class="mb-2 small">Crea {{ config.singular }} para empezar.</p>
-        <Button v-if="!filtered() && canCreate()" :icon="cilPlus" @click="ctrl.goCreate()">Crear {{ config.singular }}</Button>
+        <Button v-if="!filtered() && showCreate()" :permission="`${config.permission}.store`" color="success" :icon="cilPlus" @click="ctrl.goCreate()">Crear {{ config.singular }}</Button>
         <Button v-else-if="filtered()" color="secondary" variant="outline" @click="ctrl.onSearch('')">Limpiar búsqueda</Button>
       </EmptyState>
 
@@ -76,6 +76,7 @@ const colClass = (col, i) => {
               </button>
               <template v-else>{{ col.label }}</template>
             </CTableHeaderCell>
+            <CTableHeaderCell v-if="config.withTrashed">Estado</CTableHeaderCell>
             <CTableHeaderCell class="text-end">Acciones</CTableHeaderCell>
           </CTableRow>
         </CTableHead>
@@ -83,8 +84,8 @@ const colClass = (col, i) => {
           <CTableRow v-for="row in ctrl.items" :key="row.id">
             <CTableDataCell v-for="(col, i) in config.columns" :key="col.key" :class="colClass(col, i)">
               <slot :name="`cell-${col.key}`" :row="row"><CellValue :row="row" :col="col" /></slot>
-              <CBadge v-if="i === 0 && row.deleted_at" color="secondary" class="ms-1">Inactivo</CBadge>
             </CTableDataCell>
+            <CTableDataCell v-if="config.withTrashed"><CBadge :color="row.deleted_at ? 'secondary' : 'success'">{{ row.deleted_at ? 'Inactivo' : 'Activo' }}</CBadge></CTableDataCell>
             <CTableDataCell class="text-end text-nowrap"><RowActions :ctrl="ctrl" :config="config" :row="row" /></CTableDataCell>
           </CTableRow>
         </CTableBody>
@@ -98,7 +99,7 @@ const colClass = (col, i) => {
             <CCardBody class="d-flex flex-column">
               <h6 class="mb-2">
                 <CellValue :row="row" :col="config.columns[0]" />
-                <CBadge v-if="row.deleted_at" color="secondary" class="ms-1">Inactivo</CBadge>
+                <CBadge v-if="config.withTrashed" :color="row.deleted_at ? 'secondary' : 'success'" class="ms-1">{{ row.deleted_at ? 'Inactivo' : 'Activo' }}</CBadge>
               </h6>
               <dl class="small mb-3">
                 <div v-for="col in config.columns.slice(1)" :key="col.key" class="d-flex gap-2">

@@ -1,4 +1,5 @@
 <script setup>
+import { cilArrowLeft } from '@coreui/icons'
 import { computed, onMounted, ref } from 'vue'
 import UserService from '@/services/UserService'
 import PositionService from '@/services/PositionService'
@@ -60,6 +61,7 @@ const apply = async (item, checked) => {
 const run = async (list, checked) => {
   if (!canEdit.value) return
   busy.value = true
+  alerts.muted = true
   try {
     for (const item of list) {
       if (selected.value.includes(item.id) !== checked) await apply(item, checked)
@@ -68,6 +70,7 @@ const run = async (list, checked) => {
   } catch (error) {
     alerts.error(errorMessage(error))
   } finally {
+    alerts.muted = false
     busy.value = false
   }
 }
@@ -77,7 +80,7 @@ const run = async (list, checked) => {
   <CCard class="fade-in">
     <CCardHeader class="d-flex justify-content-between align-items-center">
       <strong>{{ k.title }}: {{ k.name(record) }}</strong>
-      <CButton color="secondary" variant="outline" size="sm" @click="$emit('back')">Volver</CButton>
+      <CButton color="secondary" variant="outline" size="sm" @click="$emit('back')"><CIcon :icon="cilArrowLeft" /> Volver</CButton>
     </CCardHeader>
     <CCardBody>
       <Skeleton v-if="loading" variant="form" />
