@@ -50,7 +50,7 @@ const apply = () => {
 </script>
 
 <template>
-  <CModal :visible="visible" alignment="center" @close="emit('close')">
+  <CModal teleport :visible="visible" alignment="center" @close="emit('close')">
     <CModalHeader><CModalTitle>Aplicar curva</CModalTitle></CModalHeader>
     <CModalBody>
       <p class="text-body-secondary small">

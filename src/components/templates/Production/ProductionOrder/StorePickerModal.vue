@@ -37,7 +37,7 @@ const toggleAll = () => {
 </script>
 
 <template>
-  <CModal :visible="visible" scrollable alignment="center" @close="emit('close')">
+  <CModal teleport :visible="visible" scrollable alignment="center" @close="emit('close')">
     <CModalHeader><CModalTitle>Agregar tiendas</CModalTitle></CModalHeader>
     <CModalBody>
       <CFormInput v-model="search" placeholder="Buscar tienda..." class="mb-2" />

@@ -87,7 +87,7 @@ const changes = (a) => {
 </script>
 
 <template>
-  <CModal :visible="visible" size="lg" scrollable alignment="center" @close="emit('close')">
+  <CModal teleport :visible="visible" size="lg" scrollable alignment="center" @close="emit('close')">
     <CModalHeader><CModalTitle><CIcon :icon="cilHistory" class="me-2" />Auditoría{{ title ? ` · ${title}` : '' }}</CModalTitle></CModalHeader>
     <CModalBody>
       <Skeleton v-if="loading" variant="form" />

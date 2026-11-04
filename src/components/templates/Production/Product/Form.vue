@@ -1,4 +1,5 @@
 <script setup>
+import ComboSelect from '@/components/UI/templates/ComboSelect.vue'
 import { cilSave } from '@coreui/icons'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -108,10 +109,7 @@ const save = async () => {
         <CRow>
           <CCol md="4">
             <FormField label="Colección" required :error="get('collection_id')">
-              <CFormSelect v-model="form.collection_id" :disabled="!!id" :invalid="!!get('collection_id')">
-                <option value="">Selecciona...</option>
-                <option v-for="c in options.collections" :key="c.id" :value="c.id">{{ c.name }} ({{ c.product_prefix }})</option>
-              </CFormSelect>
+              <ComboSelect v-model="form.collection_id" :options="options.collections.map((c) => ({ value: c.id, label: `${c.name} (${c.product_prefix})` }))" :disabled="!!id" :invalid="!!get('collection_id')" />
               <div v-if="!id && nextCode" class="form-text">Código estimado: <strong>{{ nextCode }}</strong> (se asigna al guardar)</div>
             </FormField>
           </CCol>

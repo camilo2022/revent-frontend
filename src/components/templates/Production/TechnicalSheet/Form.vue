@@ -1,4 +1,5 @@
 <script setup>
+import ComboSelect from '@/components/UI/templates/ComboSelect.vue'
 import { cilSave } from '@coreui/icons'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -33,10 +34,10 @@ const form = reactive({
   process: '', description: '', observation: '',
 })
 
-// Si la categoría trae sus subcategorías se usan; si no, todas
+// Solo las subcategorías asignadas a la categoría elegida
 const subcategories = computed(() => {
   const category = options.categories.find((c) => c.id === Number(form.category_id))
-  return category?.subcategories?.length ? category.subcategories : options.subcategories
+  return category?.subcategories ?? []
 })
 
 onMounted(async () => {
@@ -100,34 +101,35 @@ const save = async () => {
       <CCardBody>
         <FormField label="Producto" required :error="get('product_id')">
           <CFormInput v-if="id" :model-value="`${sheet?.product?.code} · ${sheet?.product?.name}`" disabled />
-          <CFormSelect v-else v-model="form.product_id" :invalid="!!get('product_id')">
-            <option value="">Selecciona un producto sin ficha...</option>
-            <option v-for="p in products" :key="p.id" :value="p.id">{{ p.code }} · {{ p.name }}</option>
-          </CFormSelect>
+          <ComboSelect
+            v-else
+            v-model="form.product_id"
+            :options="products.map((p) => ({ value: p.id, label: `${p.code} · ${p.name}` }))"
+            placeholder="Escribe o selecciona un producto sin ficha..."
+            :invalid="!!get('product_id')"
+          />
         </FormField>
         <CRow>
           <CCol md="4">
             <FormField label="Marca" required :error="get('trademark_id')">
-              <CFormSelect v-model="form.trademark_id" :invalid="!!get('trademark_id')">
-                <option value="">Selecciona...</option>
-                <option v-for="t in options.trademarks" :key="t.id" :value="t.id">{{ t.name }}</option>
-              </CFormSelect>
+              <ComboSelect v-model="form.trademark_id" :options="options.trademarks.map((t) => ({ value: t.id, label: t.name }))" :invalid="!!get('trademark_id')" />
             </FormField>
           </CCol>
           <CCol md="4">
             <FormField label="Categoría" required :error="get('category_id')">
-              <CFormSelect v-model="form.category_id" :invalid="!!get('category_id')" @change="form.subcategory_id = ''">
-                <option value="">Selecciona...</option>
-                <option v-for="c in options.categories" :key="c.id" :value="c.id">{{ c.name }}</option>
-              </CFormSelect>
+              <ComboSelect v-model="form.category_id" :options="options.categories.map((c) => ({ value: c.id, label: c.name }))" :invalid="!!get('category_id')" @change="form.subcategory_id = ''" />
             </FormField>
           </CCol>
           <CCol md="4">
             <FormField label="Subcategoría" required :error="get('subcategory_id')">
-              <CFormSelect v-model="form.subcategory_id" :invalid="!!get('subcategory_id')">
-                <option value="">Selecciona...</option>
-                <option v-for="s in subcategories" :key="s.id" :value="s.id">{{ s.name }}</option>
-              </CFormSelect>
+              <ComboSelect
+                v-model="form.subcategory_id"
+                :options="subcategories.map((s) => ({ value: s.id, label: s.name }))"
+                :disabled="!form.category_id"
+                :placeholder="form.category_id ? 'Escribe o selecciona...' : 'Primero elige una categoría'"
+                :empty-text="form.category_id ? 'Esta categoría no tiene subcategorías asignadas' : 'Primero elige una categoría'"
+                :invalid="!!get('subcategory_id')"
+              />
             </FormField>
           </CCol>
         </CRow>

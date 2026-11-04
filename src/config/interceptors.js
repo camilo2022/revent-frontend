@@ -10,7 +10,7 @@ export function setupInterceptors() {
       // Si algo se ejecuta bien, el backend manda `message` y se confirma con un aviso
       const message = response.data?.message?.toString().trim()
       const alerts = useAlertStore()
-      if (response.config.method !== 'get' && message && !alerts.muted && !response.config.url?.includes('/auth/')) alerts.success(message)
+      if (response.config.method !== 'get' && message && !alerts.muted && !response.config.url?.match(/\/auth\/|\/reports\/generate/)) alerts.success(message)
       return response
     },
     (error) => {

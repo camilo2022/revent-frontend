@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import {
   cilSpeedometer, cilColorPalette, cilResizeBoth, cilTag, cilLayers, cilBasket, cilDescription, cilIndustry, cilCircle, cilSettings,
   cilBuilding, cilApplications, cilPeople, cilUser, cilLockLocked, cilShieldAlt, cilList, cilHistory, cilStorage, cilBriefcase,
-  cilMedicalCross, cilHome, cilFile, cilLocationPin, cilSitemap, cilCart, cilOptions,
+  cilMedicalCross, cilHome, cilFile, cilLocationPin, cilSitemap, cilCart, cilOptions, cilChartPie,
 } from '@coreui/icons'
 import { useAuthStore } from '@/stores/authStore'
 import { useUiStore } from '@/stores/uiStore'
@@ -22,11 +22,11 @@ const icons = {
   '/suppliers': cilStorage, '/stores': cilHome, '/people': cilPeople, '/employees': cilBriefcase, '/areas': cilBuilding, '/positions': cilBriefcase,
   '/genders': cilPeople, '/blood_types': cilMedicalCross, '/risk_managers': cilShieldAlt, '/health_entities': cilMedicalCross,
   '/compensation_funds': cilHome, '/pension_funds': cilStorage, '/file_types': cilFile, '/person_types': cilList, '/document_types': cilList,
-  '/locations': cilLocationPin, '/users': cilUser, '/roles': cilShieldAlt, '/permissions': cilLockLocked, '/modules': cilApplications,
+  '/reports': cilChartPie, '/locations': cilLocationPin, '/users': cilUser, '/roles': cilShieldAlt, '/permissions': cilLockLocked, '/modules': cilApplications,
 }
 
 // Ícono de cada módulo
-const moduleIcons = { 'Producción': cilIndustry, 'Catálogos': cilTag, 'Comercial': cilCart, 'Administración': cilBuilding, 'Parámetros': cilOptions, 'Configuración': cilSettings }
+const moduleIcons = { 'Producción': cilIndustry, 'Catálogos': cilTag, 'Comercial': cilCart, 'Reportes': cilChartPie, 'Administración': cilBuilding, 'Parámetros': cilOptions, 'Configuración': cilSettings }
 const order = Object.keys(moduleIcons)
 
 // Un módulo se abre solo si la ruta actual es una de sus páginas
@@ -44,6 +44,7 @@ const fallback = [
     item('Categorías', '/categories', 'classification.categories.all'), item('Subcategorías', '/subcategories', 'classification.subcategories.all'),
   ] },
   { name: 'Comercial', items: [item('Proveedores', '/suppliers', 'suppliers.all'), item('Tiendas', '/stores', 'stores.all')] },
+  { name: 'Reportes', items: [item('Reportes', '/reports', 'reports.all')] },
   { name: 'Administración', items: [
     item('Personas', '/people', 'people.all'), item('Empleados', '/employees', 'employees.all'),
     item('Áreas', '/areas', 'organizational_structure.areas.all'), item('Cargos', '/positions', 'organizational_structure.areas.positions.all'),

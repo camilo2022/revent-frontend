@@ -38,7 +38,7 @@ const heading = computed(() => `${props.ctrl.mode === 'edit' ? 'Editar' : 'Nuevo
     </div>
   </Transition>
 
-  <CModal v-if="config.formMode === 'modal'" :visible="modal" alignment="center" backdrop="static" @close="ctrl.goIndex()">
+  <CModal v-if="config.formMode === 'modal'" teleport :visible="modal" alignment="center" backdrop="static" @close="ctrl.goIndex()">
     <CModalHeader><CModalTitle>{{ heading }}</CModalTitle></CModalHeader>
     <CModalBody><ResourceForm :ctrl="ctrl" :config="config" /></CModalBody>
   </CModal>

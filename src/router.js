@@ -22,6 +22,7 @@ const resources = {
     colors: ['Color', 'Colores', 'colors.all'], sizes: ['Size', 'Tallas', 'sizes.all'], trademarks: ['Trademark', 'Marcas', 'trademarks.all'],
     categories: ['Category', 'Categorías', 'classification.categories.all'], subcategories: ['Subcategory', 'Subcategorías', 'classification.subcategories.all'],
     suppliers: ['Supplier', 'Proveedores', 'suppliers.all'], stores: ['Store', 'Tiendas', 'stores.all'],
+    reports: ['Report', 'Reportes', 'reports.all'],
   },
 }
 

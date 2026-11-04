@@ -1,4 +1,5 @@
 <script setup>
+import ComboSelect from './ComboSelect.vue'
 import { getPath, setPath } from '@/utils/paths'
 import { fileUrl } from '@/utils/format'
 import FormField from './FormField.vue'
@@ -28,10 +29,13 @@ const labelOf = (o) => (f.optionLabel ? f.optionLabel(o) : o.name)
 
 <template>
   <FormField :label="f.label" :required="required" :hint="f.hint" :error="get(errorKey)">
-    <CFormSelect v-if="f.type === 'select'" :model-value="value()" :invalid="!!get(f.key)" :autofocus="autofocus" @update:model-value="set">
-      <option value="">Selecciona...</option>
-      <option v-for="o in options[f.optionsKey]" :key="o.id" :value="o.id">{{ labelOf(o) }}</option>
-    </CFormSelect>
+    <ComboSelect
+      v-if="f.type === 'select'"
+      :model-value="value()"
+      :options="(options[f.optionsKey] ?? []).map((o) => ({ value: o.id, label: labelOf(o) }))"
+      :invalid="!!get(f.key)"
+      @update:model-value="set"
+    />
     <SearchSelect
       v-else-if="f.type === 'remote'"
       :model-value="value()"

@@ -63,7 +63,7 @@ const apply = () => {
 </script>
 
 <template>
-  <CModal :visible="visible" alignment="center" scrollable @close="emit('close')">
+  <CModal teleport :visible="visible" alignment="center" scrollable @close="emit('close')">
     <CModalHeader><CModalTitle>Copiar a otras tiendas o colores</CModalTitle></CModalHeader>
     <CModalBody>
       <p class="small text-body-secondary">Origen: color <strong>{{ source?.color?.name }}</strong>. Las tallas se emparejan por nombre de talla.</p>

@@ -1,4 +1,5 @@
 <script setup>
+import ComboSelect from '@/components/UI/templates/ComboSelect.vue'
 import { cilSave } from '@coreui/icons'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -207,23 +208,19 @@ const save = async () => {
                 :model-value="`${sheet?.product?.code} · ${sheet?.product?.name}`"
                 disabled
               />
-              <CFormSelect
+              <ComboSelect
                 v-else
                 v-model="form.technical_sheet_id"
+                :options="sheets.map((s) => ({ value: s.id, label: `${s.product?.code} · ${s.product?.name}` }))"
+                placeholder="Escribe o selecciona una ficha..."
                 :invalid="!!get('technical_sheet_id')"
                 @change="loadSheet(form.technical_sheet_id)"
-              >
-                <option value="">Selecciona una ficha...</option>
-                <option v-for="s in sheets" :key="s.id" :value="s.id">{{ s.product?.code }} · {{ s.product?.name }}</option>
-              </CFormSelect>
+              />
             </FormField>
           </CCol>
           <CCol md="6">
             <FormField label="Proveedor" required :error="get('supplier_id')">
-              <CFormSelect v-model="form.supplier_id" :invalid="!!get('supplier_id')">
-                <option value="">Selecciona...</option>
-                <option v-for="s in options.suppliers" :key="s.id" :value="s.id">{{ s.trade_name || s.legal_name }}</option>
-              </CFormSelect>
+              <ComboSelect v-model="form.supplier_id" :options="options.suppliers.map((s) => ({ value: s.id, label: s.trade_name || s.legal_name }))" :invalid="!!get('supplier_id')" />
             </FormField>
           </CCol>
         </CRow>
