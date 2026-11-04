@@ -14,6 +14,7 @@ const props = defineProps({
   options: { type: Object, default: () => ({}) },
   get: { type: Function, required: true }, // error por campo
   isEdit: Boolean,
+  autofocus: Boolean, // primer campo del formulario: recibe el foco al abrir
 })
 
 const f = props.field
@@ -27,7 +28,7 @@ const labelOf = (o) => (f.optionLabel ? f.optionLabel(o) : o.name)
 
 <template>
   <FormField :label="f.label" :required="required" :hint="f.hint" :error="get(errorKey)">
-    <CFormSelect v-if="f.type === 'select'" :model-value="value()" :invalid="!!get(f.key)" @update:model-value="set">
+    <CFormSelect v-if="f.type === 'select'" :model-value="value()" :invalid="!!get(f.key)" :autofocus="autofocus" @update:model-value="set">
       <option value="">Selecciona...</option>
       <option v-for="o in options[f.optionsKey]" :key="o.id" :value="o.id">{{ labelOf(o) }}</option>
     </CFormSelect>
@@ -57,12 +58,13 @@ const labelOf = (o) => (f.optionLabel ? f.optionLabel(o) : o.name)
       :invalid="!!get(f.key)"
       @update:model-value="set"
     />
-    <CFormTextarea v-else-if="f.type === 'textarea'" :model-value="value()" rows="3" :maxlength="f.maxlength" :invalid="!!get(f.key)" @update:model-value="set" />
+    <CFormTextarea v-else-if="f.type === 'textarea'" :model-value="value()" rows="3" :maxlength="f.maxlength" :invalid="!!get(f.key)" :autofocus="autofocus" @update:model-value="set" />
     <CFormInput
       v-else
       :model-value="value()"
       :type="f.type ?? 'text'"
       :maxlength="f.maxlength"
+      :autofocus="autofocus"
       :autocomplete="f.type === 'password' ? 'new-password' : undefined"
       :invalid="!!get(f.key)"
       @update:model-value="set"
