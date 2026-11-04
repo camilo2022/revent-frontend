@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { cilClock, cilHistory, cilPencil, cilPlus, cilReload, cilTrash, cilLink, cilGlobeAlt, cilX } from '@coreui/icons'
 import AuditService from '@/services/AuditService'
 import { errorMessage } from '@/utils/format'
@@ -15,8 +15,12 @@ const alerts = useAlertStore()
 const audits = ref([])
 const loading = ref(true)
 const open = ref({})
+// El modal se monta oculto y se abre en el siguiente tick: si nace con visible=true CoreUI no corre la transición y queda con display none
+const visible = ref(false)
 
 onMounted(async () => {
+  await nextTick()
+  visible.value = true
   try {
     const res = await AuditService.record(props.base, props.id, { per_page: 100 })
     audits.value = res.data?.audits ?? []
@@ -83,7 +87,7 @@ const changes = (a) => {
 </script>
 
 <template>
-  <CModal visible size="lg" scrollable alignment="center" @close="emit('close')">
+  <CModal :visible="visible" size="lg" scrollable alignment="center" @close="emit('close')">
     <CModalHeader><CModalTitle><CIcon :icon="cilHistory" class="me-2" />Auditoría{{ title ? ` · ${title}` : '' }}</CModalTitle></CModalHeader>
     <CModalBody>
       <Skeleton v-if="loading" variant="form" />
