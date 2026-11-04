@@ -48,7 +48,7 @@ watch(() => props.ctrl.mode, (m) => m === 'index' && loadCounts())
       </CFormSelect>
     </template>
     <template #form="{ ctrl: c }">
-      <Form :id="c.current?.id" @saved="c.saved()" @cancel="c.goIndex()" />
+      <Form :id="c.current?.id" @saved="c.saved(true)" @cancel="c.goIndex()" />
     </template>
     <template #show="{ ctrl: c }">
       <Show :id="c.current.id" @edit="c.goEdit(c.current)" @back="c.goIndex()" @open="(id) => c.goShow({ id })" />

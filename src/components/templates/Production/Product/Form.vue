@@ -1,8 +1,11 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import ProductService from '@/services/ProductService'
 import { useOptions } from '@/composables/useOptions'
 import { useServerErrors } from '@/composables/useServerErrors'
+import { usePermissions } from '@/composables/usePermissions'
+import { confirmAction, notify } from '@/utils/swal'
 import FormField from '@/components/UI/templates/FormField.vue'
 import LoadingForm from '@/components/UI/templates/Skeleton.vue'
 import ErrorSummary from '@/components/UI/templates/ErrorSummary.vue'
@@ -14,6 +17,8 @@ const props = defineProps({ id: [String, Number] })
 const emit = defineEmits(['saved', 'cancel'])
 const { options, loadOptions } = useOptions()
 const { errors, message, get, clear, handle } = useServerErrors()
+const { can } = usePermissions()
+const router = useRouter()
 
 const loading = ref(true)
 const saving = ref(false)
@@ -66,7 +71,19 @@ const save = async () => {
   if (!props.id) body.collection_id = form.collection_id
   try {
     const res = props.id ? await ProductService.update(props.id, body) : await ProductService.store(body)
-    emit('saved', res.data.product?.id ?? props.id)
+    const saved = res.data?.product
+    if (saved?.code) notify(`Producto ${saved.code} · ${saved.name} ${props.id ? 'actualizado' : 'creado'}.`)
+    emit('saved', saved?.id ?? props.id)
+    // Siguiente paso: la ficha técnica (solo al crear y si tiene permiso)
+    if (!props.id && saved?.id && can('technical_sheets.store')) {
+      const go = await confirmAction({
+        title: 'Producto creado',
+        text: '¿Quieres crear ahora la ficha técnica de este producto? Es el siguiente paso antes de la orden de producción.',
+        confirmText: 'Sí, crear la ficha técnica',
+        icon: 'success',
+      })
+      if (go) router.push({ path: '/technical_sheets', query: { panel: 'create', product_id: saved.id } })
+    }
   } catch (error) {
     handle(error)
   } finally {
@@ -120,7 +137,7 @@ const save = async () => {
     <CCard class="mb-4">
       <CCardHeader><strong>Colores y tallas</strong><span class="text-danger" aria-label="obligatorio"> *</span></CCardHeader>
       <CCardBody>
-        <ColorSizeEditor v-model="colors" :colors="options.colors" :sizes="options.sizes" />
+        <ColorSizeEditor v-model="colors" :colors="options.colors" :sizes="options.sizes" :product-code="product?.code ?? ''" />
       </CCardBody>
     </CCard>
 

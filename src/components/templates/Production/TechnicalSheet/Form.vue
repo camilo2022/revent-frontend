@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import TechnicalSheetService from '@/services/TechnicalSheetService'
 import ProductService from '@/services/ProductService'
 import { useOptions } from '@/composables/useOptions'
@@ -15,6 +16,7 @@ const props = defineProps({ id: [String, Number] })
 const emit = defineEmits(['saved', 'cancel'])
 const { options, loadOptions } = useOptions()
 const { errors, message, get, clear, handle } = useServerErrors()
+const route = useRoute()
 
 const loading = ref(true)
 const saving = ref(false)
@@ -47,6 +49,9 @@ onMounted(async () => {
     } else {
       const res = await ProductService.all()
       products.value = res.data.products.filter((p) => !p.technical_sheet)
+      // Llegó desde "Crear producto": deja el producto ya elegido
+      const preset = Number(route.query.product_id)
+      if (preset && products.value.some((p) => p.id === preset)) form.product_id = preset
     }
   } catch (error) {
     handle(error)

@@ -103,8 +103,8 @@ export function useResourceController({ service, Model, configuration: config, f
     mode.value = name
   }
   // Tras guardar en un formulario propio
-  const saved = () => {
-    alerts.success('Guardado correctamente')
+  const saved = (quiet = false) => {
+    if (!quiet) alerts.success('Guardado correctamente') // los formularios propios ya avisan con el nombre del registro
     goIndex()
     load()
   }
