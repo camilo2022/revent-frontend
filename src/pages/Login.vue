@@ -35,7 +35,7 @@ const submit = async () => {
           <CCard class="p-4">
             <CCardBody>
               <div class="text-center mb-4">
-                <img :src="logo" alt="Revent" height="56" class="mb-2" />
+                <img :src="logo" alt="Revent" class="brand-logo-img brand-logo-img-lg mb-2" />
                 <h4 class="mb-0">TechRevent</h4>
                 <small class="text-body-secondary">Inicia sesión para continuar</small>
               </div>
