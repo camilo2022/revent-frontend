@@ -1,0 +1,56 @@
+// CoreUI recibe la paleta de Revent
+@use '@coreui/coreui/scss/coreui' with (
+  $primary: #16a34a,
+  $success: #16a34a,
+  $danger: #dc2626,
+  $warning: #f59e0b,
+  $font-family-sans-serif: ('Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif)
+);
+
+// Tokens provisionales de Revent: cambiar aquí cuando llegue la paleta oficial
+:root {
+  --revent-primary: #16a34a;
+  --revent-dark: #1f2937;
+  --revent-slate-50: #f8fafc;
+  --revent-slate-100: #f1f5f9;
+  --revent-slate-200: #e2e8f0;
+  --revent-slate-500: #64748b;
+  --revent-slate-700: #334155;
+  --revent-success: #16a34a;
+  --revent-danger: #dc2626;
+  --revent-warning: #f59e0b;
+}
+
+body {
+  background-color: var(--cui-tertiary-bg);
+}
+
+// Sidebar oscuro de la marca
+.sidebar {
+  --cui-sidebar-bg: var(--revent-dark);
+}
+
+.card {
+  border: 0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+// Matriz tienda x talla
+.matrix-table th,
+.matrix-table td {
+  vertical-align: middle;
+  text-align: center;
+  white-space: nowrap;
+}
+.matrix-table td input {
+  width: 4.5rem;
+  text-align: center;
+  margin: 0 auto;
+}
+.matrix-table .store-col {
+  text-align: left;
+  min-width: 10rem;
+}
+.spec-pre {
+  white-space: pre-wrap;
+}
