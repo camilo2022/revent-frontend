@@ -90,9 +90,9 @@ const sizes = [size1, ...extraSizes].filter(Boolean)
 const collection = await step('colección: crear', async () => {
   for (let i = 0; i < 20; i++) {
     try {
-      return first(await CollectionS.store(new Collection({ name: `SMK${rnd(4)}`, description: 'PRUEBA', year: String(Math.floor(Math.random() * 90) + 10), code: String(Math.floor(Math.random() * 10)) })))
+      return first(await CollectionS.store(new Collection({ name: `SMK${rnd(4)}`, description: 'PRUEBA', settings: { year: String(Math.floor(Math.random() * 90) + 10), code: String(Math.floor(Math.random() * 10)) } })))
     } catch (e) {
-      if (!e?.errors?.code) throw e
+      if (!e?.errors?.code && !e?.errors?.['settings.code']) throw e
     }
   }
   throw new Error('no se halló año/código libre')
