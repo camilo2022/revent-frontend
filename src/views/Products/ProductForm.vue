@@ -8,6 +8,7 @@ import { notify } from '@/utils/swal'
 import FormField from '@/components/FormField.vue'
 import LoadingForm from '@/components/LoadingForm.vue'
 import ErrorSummary from '@/components/ErrorSummary.vue'
+import RequiredNote from '@/components/RequiredNote.vue'
 import ColorSizeEditor from '@/components/ColorSizeEditor.vue'
 
 // Formulario compartido de crear (sin id) y editar (con id)
@@ -54,7 +55,7 @@ const save = async () => {
   saving.value = true
   clear()
   const body = {
-    name: form.name,
+    name: form.name.toUpperCase(),
     description: form.description || null,
     price: form.price === '' || form.price === null ? null : Number(form.price),
     cost: form.cost === '' || form.cost === null ? null : Number(form.cost),
@@ -120,13 +121,14 @@ const save = async () => {
     </CCard>
 
     <CCard class="mb-4">
-      <CCardHeader><strong>Colores y tallas</strong></CCardHeader>
+      <CCardHeader><strong>Colores y tallas</strong><span class="text-danger" aria-label="obligatorio"> *</span></CCardHeader>
       <CCardBody>
         <ColorSizeEditor v-model="colors" :colors="options.colors" :sizes="options.sizes" />
       </CCardBody>
     </CCard>
 
-    <div class="d-flex justify-content-end gap-2">
+    <RequiredNote />
+    <div class="d-flex justify-content-end gap-2 mt-3">
       <RouterLink to="/products"><CButton color="secondary" variant="outline">Cancelar</CButton></RouterLink>
       <CButton type="submit" color="primary" :disabled="saving"><CSpinner v-if="saving" size="sm" /> Guardar</CButton>
     </div>

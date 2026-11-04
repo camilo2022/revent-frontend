@@ -20,17 +20,27 @@ const icons = {
 }
 
 // Menú de respaldo cuando la API no devuelve navegación
+const item = (name, url, permission) => ({ name, url, permission })
 const fallback = [
-  { name: 'Producción', items: [
-    { name: 'Productos', url: '/products', permission: 'products.all' },
-    { name: 'Fichas técnicas', url: '/technical_sheets', permission: 'technical_sheets.all' },
-    { name: 'Órdenes de producción', url: '/production_orders', permission: 'production_orders.all' },
+  { name: 'Configuración', items: [
+    item('Usuarios', '/users', 'users.all'), item('Personas', '/people', 'people.all'), item('Empleados', '/employees', 'employees.all'),
+    item('Roles', '/roles', 'authorization.roles.all'), item('Permisos', '/permissions', 'authorization.permissions.all'),
+    item('Módulos', '/modules', 'navegation.modules.all'), item('Auditoría', '/audits', 'audits.all'),
   ] },
-  { name: 'Catálogos', items: [
-    { name: 'Colores', url: '/colors', permission: 'colors.all' },
-    { name: 'Tallas', url: '/sizes', permission: 'sizes.all' },
-    { name: 'Marcas', url: '/trademarks', permission: 'trademarks.all' },
-    { name: 'Colecciones', url: '/collections', permission: 'collections.all' },
+  { name: 'Administración', items: [
+    item('Áreas', '/areas', 'organizational_structure.areas.all'), item('Cargos', '/positions', 'organizational_structure.areas.positions.all'),
+    item('Géneros', '/genders', 'genders.all'), item('Tipos de sangre', '/blood_types', 'blood_types.all'),
+    item('Administradoras de riesgos', '/risk_managers', 'risk_managers.all'), item('Entidades de salud', '/health_entities', 'health_entities.all'),
+    item('Cajas de compensación', '/compensation_funds', 'compensation_funds.all'), item('Fondos de pensión', '/pension_funds', 'pension_funds.all'),
+    item('Tipos de archivo', '/file_types', 'file_types.all'), item('Tipos de persona', '/person_types', 'identification.person_types.all'),
+    item('Tipos de documento', '/document_types', 'identification.document_types.all'), item('Ubicaciones', '/locations', ''),
+  ] },
+  { name: 'Producción', items: [
+    item('Colecciones', '/collections', 'collections.all'), item('Productos', '/products', 'products.all'),
+    item('Fichas técnicas', '/technical_sheets', 'technical_sheets.all'), item('Órdenes de producción', '/production_orders', 'production_orders.all'),
+    item('Colores', '/colors', 'colors.all'), item('Tallas', '/sizes', 'sizes.all'), item('Marcas', '/trademarks', 'trademarks.all'),
+    item('Categorías', '/categories', 'classification.categories.all'), item('Subcategorías', '/subcategories', 'classification.subcategories.all'),
+    item('Proveedores', '/suppliers', 'suppliers.all'), item('Tiendas', '/stores', 'stores.all'),
   ] },
 ]
 

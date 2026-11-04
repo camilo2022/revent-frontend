@@ -33,6 +33,52 @@ const children = [
   { path: 'production_orders/:id/edit', component: () => import('@/views/ProductionOrders/Edit.vue'), props: true, meta: { title: 'Editar', permission: 'production_orders.update', parent: { title: 'Órdenes de producción', to: '/production_orders' } } },
 ]
 
+// Rutas de lista/crear/ver/editar de un recurso genérico (views/Resources)
+const crudRoutes = (key, path, title, perm) => {
+  const page = (name) => () => import(`@/views/Resources/Resource${name}.vue`)
+  const meta = (t, a) => ({ title: t, permission: `${perm}.${a}`, ...(t === title ? {} : { parent: { title, to: `/${path.split('/:')[0]}` } }) })
+  return [
+    { path, component: page('List'), props: { resource: key }, meta: meta(title, 'all') },
+    { path: `${path}/create`, component: page('Form'), props: { resource: key }, meta: meta('Nuevo', 'store') },
+    { path: `${path}/:id`, component: page('Show'), props: (r) => ({ resource: key, id: r.params.id }), meta: meta('Detalle', 'find') },
+    { path: `${path}/:id/edit`, component: page('Form'), props: (r) => ({ resource: key, id: r.params.id }), meta: meta('Editar', 'update') },
+  ]
+}
+const assign = () => import('@/views/Security/PermissionAssign.vue')
+const simpleCatalogs = {
+  genders: ['Géneros', 'genders.all'], blood_types: ['Tipos de sangre', 'blood_types.all'], health_entities: ['Entidades de salud', 'health_entities.all'],
+  pension_funds: ['Fondos de pensión', 'pension_funds.all'], compensation_funds: ['Cajas de compensación', 'compensation_funds.all'],
+  risk_managers: ['Administradoras de riesgos', 'risk_managers.all'], file_types: ['Tipos de archivo', 'file_types.all'],
+  person_types: ['Tipos de persona', 'identification.person_types.all'], document_types: ['Tipos de documento', 'identification.document_types.all'],
+  areas: ['Áreas', 'organizational_structure.areas.all'], positions: ['Cargos', 'organizational_structure.areas.positions.all'],
+  categories: ['Categorías', 'classification.categories.all'], subcategories: ['Subcategorías', 'classification.subcategories.all'],
+}
+children.push(
+  ...crudRoutes('people', 'people', 'Personas', 'people'),
+  ...crudRoutes('employees', 'employees', 'Empleados', 'employees'),
+  ...crudRoutes('users', 'users', 'Usuarios', 'users'),
+  ...crudRoutes('suppliers', 'suppliers', 'Proveedores', 'suppliers'),
+  ...crudRoutes('stores', 'stores', 'Tiendas', 'stores'),
+  ...crudRoutes('roles', 'roles', 'Roles', 'authorization.roles'),
+  ...crudRoutes('permissions', 'permissions', 'Permisos', 'authorization.permissions'),
+  ...crudRoutes('modules', 'modules', 'Módulos', 'navegation.modules'),
+  ...crudRoutes('submodules', 'modules/:moduleId/submodules', 'Submódulos', 'navegation.modules.submodules'),
+  // Catálogos simples con CRUD en modal
+  ...Object.entries(simpleCatalogs).map(([key, [title, permission]]) => ({ path: key, component: CatalogPage, props: { catalog: key }, meta: { title, permission } })),
+  // Asignaciones con casillas
+  { path: 'users/:id/permissions', component: assign, props: (r) => ({ kind: 'users', id: r.params.id }), meta: { title: 'Permisos', permission: 'users.authorization.assign', parent: { title: 'Usuarios', to: '/users' } } },
+  { path: 'positions/:id/permissions', component: assign, props: (r) => ({ kind: 'positions', id: r.params.id }), meta: { title: 'Permisos', permission: 'organizational_structure.areas.positions.authorization.assign', parent: { title: 'Cargos', to: '/positions' } } },
+  { path: 'categories/:id/subcategories', component: assign, props: (r) => ({ kind: 'categories', id: r.params.id }), meta: { title: 'Subcategorías', permission: 'classification.categories.subcategories.assign', parent: { title: 'Categorías', to: '/categories' } } },
+  // Ubicaciones (solo lectura)
+  { path: 'locations', redirect: '/locations/countries' },
+  { path: 'locations/:kind', component: () => import('@/views/Resources/Locations.vue'), meta: { title: 'Ubicaciones' } },
+  { path: 'locations/:kind/:id', component: () => import('@/views/Resources/ResourceShow.vue'), props: (r) => ({ resource: r.params.kind, id: r.params.id }), meta: { title: 'Detalle', parent: { title: 'Ubicaciones', to: '/locations' } } },
+  // Auditoría y perfil
+  { path: 'audits', component: () => import('@/views/Audits/List.vue'), meta: { title: 'Auditoría', permission: 'audits.all' } },
+  { path: 'audits/:id', component: () => import('@/views/Audits/Show.vue'), props: true, meta: { title: 'Detalle', permission: 'audits.find', parent: { title: 'Auditoría', to: '/audits' } } },
+  { path: 'profile', component: () => import('@/views/pages/Profile.vue'), meta: { title: 'Mi perfil' } },
+)
+
 const errorPage = (code) => ({
   path: `/${code}`,
   component: () => import('@/views/pages/ErrorPage.vue'),

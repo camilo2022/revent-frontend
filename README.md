@@ -40,6 +40,27 @@ src/
   scss/style.scss      tokens --revent-* y paleta de CoreUI
 ```
 
+## Pantallas
+
+- Sesión: Login, Mi perfil (`/profile`), Dashboard, 403/404/500.
+- Configuración: Usuarios (con permisos), Personas, Empleados, Roles, Permisos, Módulos y Submódulos, Auditoría (filtros y detalle antes/después).
+- Administración: Áreas, Cargos (con permisos), Géneros, Tipos de sangre, Administradoras de riesgos, Entidades de salud, Cajas de compensación, Fondos de pensión, Tipos de archivo, Tipos de persona, Tipos de documento, Ubicaciones (solo lectura).
+- Producción: Colecciones, Productos, Fichas técnicas, Órdenes de producción, Colores, Tallas, Marcas, Categorías (con subcategorías), Subcategorías, Proveedores, Tiendas.
+
+Las rutas del frontend usan la misma url que la API sin prefijo (`/people`, `/areas`, `/blood_types`...).
+
+## Campos obligatorios
+
+`FormField` recibe `required` y muestra un asterisco rojo (`aria-label="obligatorio"`) junto a la etiqueta. Cada formulario termina con `<RequiredNote />` ("* Campo obligatorio"). En los formularios por configuración basta `required: true` (o `requiredOnCreate: true`) en la definición del campo.
+
+## Agregar un recurso con página propia (lista, formulario, detalle)
+
+1. Servicio en `src/services/` con `makeCrud('/ruta')` (o `makeReadOnly`).
+2. Entrada en `src/views/Resources/resources.config.js`: `title`, `route`, `permission`, `service`, `listKey`, `columns`, `fields` (tipos `text`, `textarea`, `date`, `email`, `password`, `select`, `remote`, `location`, `file`) y `show`.
+3. En `src/router/index.js` agrega `...crudRoutes('clave', 'ruta', 'Título', 'permiso')` y el ítem en el menú de respaldo de `AppSidebar.vue`.
+
+Componentes compartidos: `RemoteSelect` (búsqueda remota con debounce y paginación), `LocationPicker` (país/departamento/ciudad), `FileUpload` (vista previa), `CheckList` (casillas con búsqueda y grupos).
+
 ## Permisos
 
 Las acciones se ocultan si el usuario no tiene el permiso `<recurso>.<acción>` (en `user.permissions[].name`). La API igual valida con 403.

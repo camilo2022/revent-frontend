@@ -25,7 +25,7 @@ const logout = async () => {
         <CButton color="secondary" variant="ghost" :title="ui.theme === 'dark' ? 'Tema claro' : 'Tema oscuro'" @click="ui.toggleTheme()">
           <CIcon :icon="ui.theme === 'dark' ? cilSun : cilMoon" />
         </CButton>
-        <span class="text-body-secondary d-none d-md-inline"><CIcon :icon="cilUser" /> {{ auth.userName }}</span>
+        <RouterLink to="/profile" class="text-body-secondary d-none d-md-inline text-decoration-none"><CIcon :icon="cilUser" /> {{ auth.userName }}</RouterLink>
         <CButton color="secondary" variant="outline" size="sm" @click="logout">
           <CIcon :icon="cilAccountLogout" /> Cerrar sesión
         </CButton>

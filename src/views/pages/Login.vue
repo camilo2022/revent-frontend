@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useServerErrors } from '@/composables/useServerErrors'
 import FormField from '@/components/FormField.vue'
+import RequiredNote from '@/components/RequiredNote.vue'
 import logo from '@/assets/brand/revent-logo.png'
 
 const auth = useAuthStore()
@@ -40,15 +41,16 @@ const submit = async () => {
               </div>
               <CAlert v-if="message" color="danger" class="py-2">{{ message }}</CAlert>
               <form @submit.prevent="submit">
-                <FormField label="Usuario" :error="get('username')">
+                <FormField label="Usuario" required :error="get('username')">
                   <CFormInput v-model="form.username" autocomplete="username" :invalid="!!get('username')" />
                 </FormField>
-                <FormField label="Contraseña" :error="get('password')">
+                <FormField label="Contraseña" required :error="get('password')">
                   <CFormInput v-model="form.password" type="password" autocomplete="current-password" :invalid="!!get('password')" />
                 </FormField>
                 <CButton type="submit" color="primary" class="w-100" :disabled="saving">
                   <CSpinner v-if="saving" size="sm" /> Ingresar
                 </CButton>
+                <RequiredNote />
               </form>
             </CCardBody>
           </CCard>

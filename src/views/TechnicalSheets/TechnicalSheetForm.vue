@@ -9,6 +9,7 @@ import { notify } from '@/utils/swal'
 import FormField from '@/components/FormField.vue'
 import LoadingForm from '@/components/LoadingForm.vue'
 import ErrorSummary from '@/components/ErrorSummary.vue'
+import RequiredNote from '@/components/RequiredNote.vue'
 import KeyValueEditor from '@/components/KeyValueEditor.vue'
 
 // Formulario compartido de crear (sin id) y editar (con id)
@@ -143,7 +144,8 @@ const save = async () => {
       </CCardBody>
     </CCard>
 
-    <div class="d-flex justify-content-end gap-2">
+    <RequiredNote />
+    <div class="d-flex justify-content-end gap-2 mt-3">
       <RouterLink to="/technical_sheets"><CButton color="secondary" variant="outline">Cancelar</CButton></RouterLink>
       <CButton type="submit" color="primary" :disabled="saving"><CSpinner v-if="saving" size="sm" /> Guardar</CButton>
     </div>

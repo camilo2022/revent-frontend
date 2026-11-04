@@ -11,6 +11,7 @@ import { cell, ensureStore, lineTotal, newLine } from '@/utils/orderMatrix'
 import FormField from '@/components/FormField.vue'
 import LoadingForm from '@/components/LoadingForm.vue'
 import ErrorSummary from '@/components/ErrorSummary.vue'
+import RequiredNote from '@/components/RequiredNote.vue'
 import OrderColorMatrix from '@/components/order/OrderColorMatrix.vue'
 import CopyModal from '@/components/order/CopyModal.vue'
 
@@ -219,12 +220,12 @@ const save = async () => {
             </FormField>
           </CCol>
           <CCol md="4">
-            <FormField label="% IVA" :error="get('vat_percentage')">
+            <FormField label="% IVA" required :error="get('vat_percentage')">
               <CFormInput v-model="form.vat_percentage" type="number" min="0" :invalid="!!get('vat_percentage')" />
             </FormField>
           </CCol>
           <CCol md="4">
-            <FormField label="% Remisión" :error="get('delivery_note_percentage')">
+            <FormField label="% Remisión" required :error="get('delivery_note_percentage')">
               <CFormInput v-model="form.delivery_note_percentage" type="number" min="0" :invalid="!!get('delivery_note_percentage')" />
             </FormField>
           </CCol>
@@ -246,12 +247,12 @@ const save = async () => {
         <CCardBody v-if="lines[c.id].enabled">
           <CRow>
             <CCol md="3">
-              <FormField label="Costo" :error="lineErrors[c.id]?.cost">
+              <FormField label="Costo" required :error="lineErrors[c.id]?.cost">
                 <CFormInput v-model="lines[c.id].cost" type="number" min="0" :invalid="!!lineErrors[c.id]?.cost" />
               </FormField>
             </CCol>
             <CCol md="3">
-              <FormField label="Precio" :error="lineErrors[c.id]?.price">
+              <FormField label="Precio" required :error="lineErrors[c.id]?.price">
                 <CFormInput v-model="lines[c.id].price" type="number" min="0" :invalid="!!lineErrors[c.id]?.price" />
               </FormField>
             </CCol>
@@ -286,7 +287,8 @@ const save = async () => {
     </template>
     <p v-else class="text-body-secondary">Elige una ficha técnica aprobada para armar la orden.</p>
 
-    <div class="d-flex justify-content-end gap-2">
+    <RequiredNote />
+    <div class="d-flex justify-content-end gap-2 mt-3">
       <RouterLink to="/production_orders"><CButton color="secondary" variant="outline">Cancelar</CButton></RouterLink>
       <CButton type="submit" color="primary" :disabled="saving || !sheet || !totals.pairs"><CSpinner v-if="saving" size="sm" /> Guardar orden</CButton>
     </div>
