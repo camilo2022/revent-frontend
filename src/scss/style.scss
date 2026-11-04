@@ -18,7 +18,15 @@
 }
 
 // Logo (PNG negro sobre blanco): nunca desborda; en fondos oscuros va sobre una pastilla blanca
-.brand-logo-img { display: inline-block; max-width: 100%; height: auto; max-height: 24px; width: auto; }
+// Deja espacio al menú lateral (CoreUI guarda su ancho en estas variables)
+.wrapper {
+  width: 100%;
+  padding-inline: var(--cui-sidebar-occupy-start, 0) var(--cui-sidebar-occupy-end, 0);
+  will-change: auto;
+  transition: padding 0.15s;
+}
+
+.brand-logo-img { display: inline-block; max-width: 100%; height: auto; max-height: 22px; width: auto; }
 .brand-logo-img-lg { max-height: 48px; }
 .brand-logo { display: inline-flex; align-items: center; background: #fff; border-radius: 0.375rem; padding: 2px 6px; max-width: 100%; }
 

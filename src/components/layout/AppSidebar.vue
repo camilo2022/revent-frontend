@@ -74,7 +74,6 @@ const groups = computed(() => {
     <CSidebarHeader class="border-bottom">
       <CSidebarBrand to="/" class="gap-2">
         <span class="brand-logo"><img :src="logo" alt="Revent" class="brand-logo-img" /></span>
-        <span class="fw-semibold">TechRevent</span>
       </CSidebarBrand>
     </CSidebarHeader>
 
