@@ -1,53 +1,56 @@
 import { reactive } from 'vue'
-import Swal from 'sweetalert2'
-import { colorService } from '@/services/color.service'
-import { sizeService } from '@/services/size.service'
-import { trademarkService } from '@/services/trademark.service'
-import { collectionService } from '@/services/collection.service'
-import { categoryService } from '@/services/category.service'
-import { subcategoryService } from '@/services/subcategory.service'
-import { supplierService } from '@/services/supplier.service'
-import { storeService } from '@/services/store.service'
-import { genderService } from '@/services/gender.service'
-import { bloodTypeService } from '@/services/bloodType.service'
-import { healthEntityService } from '@/services/healthEntity.service'
-import { pensionFundService } from '@/services/pensionFund.service'
-import { compensationFundService } from '@/services/compensationFund.service'
-import { riskManagerService } from '@/services/riskManager.service'
-import { fileTypeService } from '@/services/fileType.service'
-import { personTypeService } from '@/services/personType.service'
-import { documentTypeService } from '@/services/documentType.service'
-import { areaService } from '@/services/area.service'
-import { positionService } from '@/services/position.service'
-import { roleService } from '@/services/role.service'
-import { permissionService } from '@/services/permission.service'
-import { moduleService } from '@/services/module.service'
+import ColorService from '@/services/ColorService'
+import SizeService from '@/services/SizeService'
+import TrademarkService from '@/services/TrademarkService'
+import CollectionService from '@/services/CollectionService'
+import CategoryService from '@/services/CategoryService'
+import SubcategoryService from '@/services/SubcategoryService'
+import SupplierService from '@/services/SupplierService'
+import StoreService from '@/services/StoreService'
+import GenderService from '@/services/GenderService'
+import BloodTypeService from '@/services/BloodTypeService'
+import HealthEntityService from '@/services/HealthEntityService'
+import PensionFundService from '@/services/PensionFundService'
+import CompensationFundService from '@/services/CompensationFundService'
+import RiskManagerService from '@/services/RiskManagerService'
+import FileTypeService from '@/services/FileTypeService'
+import PersonTypeService from '@/services/PersonTypeService'
+import DocumentTypeService from '@/services/DocumentTypeService'
+import AreaService from '@/services/AreaService'
+import PositionService from '@/services/PositionService'
+import RoleService from '@/services/RoleService'
+import PermissionService from '@/services/PermissionService'
+import ModuleService from '@/services/ModuleService'
+import ProductService from '@/services/ProductService'
+import { useAlertStore } from '@/stores/alertStore'
 import { errorMessage } from '@/utils/format'
 
-// Origen de cada lista para llenar selects (sin per_page la API devuelve todo)
+// Listas para los selects: la clave es la misma de la respuesta (sin per_page la API devuelve todo)
+const catalog = { with_trashed: 0 }
 const sources = {
-  colors: [colorService, { with_trashed: 0 }],
-  sizes: [sizeService, { with_trashed: 0 }],
-  trademarks: [trademarkService, { with_trashed: 0 }],
-  collections: [collectionService, { with_trashed: 0 }],
-  categories: [categoryService, { with_trashed: 0 }],
-  subcategories: [subcategoryService, { with_trashed: 0 }],
-  suppliers: [supplierService, { with_trashed: 0 }],
-  stores: [storeService, { with_trashed: 0 }],
-  genders: [genderService, { with_trashed: 0 }],
-  blood_types: [bloodTypeService, { with_trashed: 0 }],
-  health_entities: [healthEntityService, { with_trashed: 0 }],
-  pension_funds: [pensionFundService, { with_trashed: 0 }],
-  compensation_funds: [compensationFundService, { with_trashed: 0 }],
-  risk_managers: [riskManagerService, { with_trashed: 0 }],
-  file_types: [fileTypeService, { with_trashed: 0 }],
-  person_types: [personTypeService, { with_trashed: 0 }],
-  document_types: [documentTypeService, { with_trashed: 0 }],
-  areas: [areaService, { with_trashed: 0 }],
-  positions: [positionService, { with_trashed: 0 }],
-  roles: [roleService, {}],
-  permissions: [permissionService, {}],
-  modules: [moduleService, { with_trashed: 0 }],
+  colors: [ColorService, catalog],
+  sizes: [SizeService, catalog],
+  trademarks: [TrademarkService, catalog],
+  collections: [CollectionService, catalog],
+  categories: [CategoryService, catalog],
+  subcategories: [SubcategoryService, catalog],
+  suppliers: [SupplierService, catalog],
+  stores: [StoreService, catalog],
+  genders: [GenderService, catalog],
+  blood_types: [BloodTypeService, catalog],
+  health_entities: [HealthEntityService, catalog],
+  pension_funds: [PensionFundService, catalog],
+  compensation_funds: [CompensationFundService, catalog],
+  risk_managers: [RiskManagerService, catalog],
+  file_types: [FileTypeService, catalog],
+  person_types: [PersonTypeService, catalog],
+  document_types: [DocumentTypeService, catalog],
+  areas: [AreaService, catalog],
+  positions: [PositionService, catalog],
+  roles: [RoleService, {}],
+  permissions: [PermissionService, {}],
+  modules: [ModuleService, catalog],
+  products: [ProductService, {}],
 }
 
 // Uso: const { options, loadOptions } = useOptions(); await loadOptions(['colors', 'sizes'])
@@ -59,12 +62,11 @@ export function useOptions() {
       await Promise.all(
         keys.map(async (key) => {
           const [service, params] = sources[key]
-          const res = await service.all(params)
-          options[key] = res.data[key] ?? []
+          options[key] = (await service.all(params)).data[key] ?? []
         }),
       )
     } catch (error) {
-      Swal.fire({ icon: 'error', title: 'No se pudieron cargar las listas', text: errorMessage(error) })
+      useAlertStore().error(`No se pudieron cargar las listas: ${errorMessage(error)}`)
     }
   }
 

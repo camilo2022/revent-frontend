@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/authStore'
 
 // v-can="'products.store'": quita el elemento si falta el permiso
 export const vCan = {

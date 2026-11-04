@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import Swal from 'sweetalert2'
+import { useAlertStore } from '@/stores/alertStore'
 import { errorMessage } from '@/utils/format'
 
 // Guarda los errores 422 por campo (incluye claves anidadas como `a.0.b`)
@@ -15,7 +15,7 @@ export function useServerErrors() {
   // Primer mensaje de un campo
   const get = (field) => errors.value[field]?.[0] ?? ''
 
-  // Procesa el error de la API: 422 llena los campos, otros se avisan
+  // 422 llena los campos; cualquier otro error se avisa con una alerta flotante
   const handle = (error, { alert = true } = {}) => {
     clear()
     if (error?.errors) {
@@ -23,7 +23,7 @@ export function useServerErrors() {
       message.value = error.message ?? 'Error de validación.'
     } else {
       message.value = errorMessage(error)
-      if (alert) Swal.fire({ icon: 'error', title: 'No se pudo completar', text: message.value })
+      if (alert) useAlertStore().error(message.value)
     }
   }
 

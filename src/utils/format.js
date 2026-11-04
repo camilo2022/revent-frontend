@@ -28,10 +28,12 @@ export function fileUrl(file) {
 }
 
 // Objeto plano => FormData (omite nulos y vacíos; los archivos pasan tal cual)
-export function toFormData(obj) {
-  const fd = new FormData()
+export function toFormData(obj, fd = new FormData(), prefix = '') {
   Object.entries(obj).forEach(([k, v]) => {
-    if (v !== null && v !== undefined && v !== '') fd.append(k, v)
+    const key = prefix ? `${prefix}[${k}]` : k
+    if (v === null || v === undefined || v === '') return
+    if (typeof v === 'object' && !(v instanceof Blob)) toFormData(v, fd, key) // anidados: icon[file]
+    else fd.append(key, v)
   })
   return fd
 }

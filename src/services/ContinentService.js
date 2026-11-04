@@ -1,0 +1,3 @@
+import { readOnlyService } from './BaseService'
+
+export default readOnlyService('/location/continents')

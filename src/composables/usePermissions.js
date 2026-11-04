@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/authStore'
 
 // Permite preguntar `can('products.store')` en cualquier componente
 export function usePermissions() {

@@ -1,21 +1,7 @@
-import Swal from 'sweetalert2'
+import { useAlertStore } from '@/stores/alertStore'
+import { useSwalStore } from '@/stores/swalStore'
 
-// Confirmación estándar; devuelve true si el usuario acepta
-export async function confirmAction({ title = '¿Estás seguro?', text = '', confirmText = 'Sí, continuar', icon = 'question' } = {}) {
-  const result = await Swal.fire({
-    title,
-    text,
-    icon,
-    showCancelButton: true,
-    confirmButtonText: confirmText,
-    cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#16a34a',
-    reverseButtons: true,
-  })
-  return result.isConfirmed
-}
-
-// Aviso breve de éxito
-export function notify(text, icon = 'success') {
-  Swal.fire({ toast: true, position: 'top-end', icon, title: text, showConfirmButton: false, timer: 2500 })
-}
+// Atajos sobre los stores de alertas y confirmaciones
+export const confirmAction = (options) => useSwalStore().confirm(options)
+export const notify = (text) => useAlertStore().success(text)
+export const notifyError = (text) => useAlertStore().error(text)

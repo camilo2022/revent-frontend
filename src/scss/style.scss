@@ -54,3 +54,55 @@ body {
 .spec-pre {
   white-space: pre-wrap;
 }
+
+// ---- Pulido ----
+// Esqueletos de carga
+.skeleton {
+  display: inline-block;
+  border-radius: 0.375rem;
+  background: linear-gradient(90deg, var(--cui-tertiary-bg) 25%, var(--cui-secondary-bg) 37%, var(--cui-tertiary-bg) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+// Animaciones suaves
+.fade-in { animation: fade-in 0.25s ease both; }
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.panel-enter-active, .panel-leave-active { transition: opacity 0.18s ease, transform 0.18s ease; }
+.panel-enter-from, .panel-leave-to { opacity: 0; transform: translateY(6px); }
+
+// Alertas flotantes
+.alert-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2000;
+  width: min(380px, calc(100vw - 2rem));
+}
+.alert-slide-enter-active, .alert-slide-leave-active { transition: all 0.25s ease; }
+.alert-slide-enter-from, .alert-slide-leave-to { opacity: 0; transform: translateX(30px); }
+
+// Foco visible y confirmaciones coherentes con el tema
+:focus-visible { outline: 2px solid var(--revent-primary); outline-offset: 2px; }
+.swal2-popup.swal-revent { font-family: inherit; border-radius: 0.75rem; }
+[data-coreui-theme='dark'] {
+  .swal2-popup.swal-revent { background: var(--cui-body-bg); color: var(--cui-body-color); }
+  .empty-state svg { opacity: 0.9; }
+}
+
+// Móvil: tablas y barras sin desbordar
+@media (max-width: 575.98px) {
+  .card-body { padding: 0.9rem; }
+  .matrix-table td input { width: 3.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in, .skeleton, .panel-enter-active, .panel-leave-active, .alert-slide-enter-active, .alert-slide-leave-active { animation: none; transition: none; }
+}
