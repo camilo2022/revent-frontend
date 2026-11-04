@@ -4,11 +4,11 @@ import { errorMessage } from '@/utils/format'
 
 // Listado con búsqueda, orden y paginación contra una API /all
 // extra: objeto reactive con filtros (vacíos no se envían, booleanos van como 1/0)
-export function useCrud(service, listKey, { extra = {}, perPage = 10 } = {}) {
+export function useCrud(service, listKey, { extra = {}, perPage = 10, column = 'id', dir = 'desc' } = {}) {
   const items = ref([])
   const loading = ref(false)
   const pagination = ref(null)
-  const query = reactive({ search: '', column: 'id', dir: 'desc', page: 1, per_page: perPage })
+  const query = reactive({ search: '', column, dir, page: 1, per_page: perPage })
   let timer = null
 
   const load = async () => {
@@ -21,8 +21,13 @@ export function useCrud(service, listKey, { extra = {}, perPage = 10 } = {}) {
       })
       if (!params.search) delete params.search
       const res = await service.all(params)
-      items.value = res.data[listKey] ?? []
-      pagination.value = res.data.meta?.pagination ?? null
+      const d = res.data
+      items.value = Array.isArray(d) ? d : d[listKey] ?? d.data ?? []
+      // Si la API no manda meta (ubicaciones) se deduce: hay más páginas si la actual vino llena
+      pagination.value = d.meta?.pagination ?? {
+        current_page: query.page,
+        total_pages: items.value.length >= query.per_page ? query.page + 1 : query.page,
+      }
     } catch (error) {
       items.value = []
       Swal.fire({ icon: 'error', title: 'No se pudo cargar', text: errorMessage(error) })

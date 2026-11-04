@@ -77,8 +77,8 @@ const pages = () => {
       </CTableBody>
     </CTable>
 
-    <div v-if="pagination && pagination.total_pages > 1" class="d-flex justify-content-between align-items-center">
-      <small class="text-body-secondary">{{ pagination.total }} registros</small>
+    <div v-if="pagination && (pagination.total_pages > 1 || pagination.current_page > 1)" class="d-flex justify-content-between align-items-center">
+      <small class="text-body-secondary">{{ pagination.total != null ? `${pagination.total} registros` : '' }}</small>
       <CPagination class="mb-0">
         <CPaginationItem :disabled="pagination.current_page <= 1" @click="emit('page', pagination.current_page - 1)">&laquo;</CPaginationItem>
         <CPaginationItem v-for="p in pages()" :key="p" :active="p === pagination.current_page" @click="emit('page', p)">{{ p }}</CPaginationItem>

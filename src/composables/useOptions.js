@@ -8,6 +8,20 @@ import { categoryService } from '@/services/category.service'
 import { subcategoryService } from '@/services/subcategory.service'
 import { supplierService } from '@/services/supplier.service'
 import { storeService } from '@/services/store.service'
+import { genderService } from '@/services/gender.service'
+import { bloodTypeService } from '@/services/bloodType.service'
+import { healthEntityService } from '@/services/healthEntity.service'
+import { pensionFundService } from '@/services/pensionFund.service'
+import { compensationFundService } from '@/services/compensationFund.service'
+import { riskManagerService } from '@/services/riskManager.service'
+import { fileTypeService } from '@/services/fileType.service'
+import { personTypeService } from '@/services/personType.service'
+import { documentTypeService } from '@/services/documentType.service'
+import { areaService } from '@/services/area.service'
+import { positionService } from '@/services/position.service'
+import { roleService } from '@/services/role.service'
+import { permissionService } from '@/services/permission.service'
+import { moduleService } from '@/services/module.service'
 import { errorMessage } from '@/utils/format'
 
 // Origen de cada lista para llenar selects (sin per_page la API devuelve todo)
@@ -20,6 +34,20 @@ const sources = {
   subcategories: [subcategoryService, { with_trashed: 0 }],
   suppliers: [supplierService, { with_trashed: 0 }],
   stores: [storeService, { with_trashed: 0 }],
+  genders: [genderService, { with_trashed: 0 }],
+  blood_types: [bloodTypeService, { with_trashed: 0 }],
+  health_entities: [healthEntityService, { with_trashed: 0 }],
+  pension_funds: [pensionFundService, { with_trashed: 0 }],
+  compensation_funds: [compensationFundService, { with_trashed: 0 }],
+  risk_managers: [riskManagerService, { with_trashed: 0 }],
+  file_types: [fileTypeService, { with_trashed: 0 }],
+  person_types: [personTypeService, { with_trashed: 0 }],
+  document_types: [documentTypeService, { with_trashed: 0 }],
+  areas: [areaService, { with_trashed: 0 }],
+  positions: [positionService, { with_trashed: 0 }],
+  roles: [roleService, {}],
+  permissions: [permissionService, {}],
+  modules: [moduleService, { with_trashed: 0 }],
 }
 
 // Uso: const { options, loadOptions } = useOptions(); await loadOptions(['colors', 'sizes'])

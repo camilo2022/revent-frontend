@@ -1,3 +1,9 @@
-import { makeCrud } from './crud'
+import { makeAssign, makeCrud } from './crud'
 
-export const categoryService = makeCrud('/classification/categories')
+const base = '/classification/categories'
+
+// assign/remove reciben { subcategory_id }
+export const categoryService = {
+  ...makeCrud(base),
+  ...makeAssign(`${base}/subcategories`),
+}

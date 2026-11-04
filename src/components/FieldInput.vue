@@ -1,0 +1,71 @@
+<script setup>
+import { getPath, setPath } from '@/utils/paths'
+import { fileUrl } from '@/utils/format'
+import FormField from './FormField.vue'
+import RemoteSelect from './RemoteSelect.vue'
+import LocationPicker from './LocationPicker.vue'
+import FileUpload from './FileUpload.vue'
+
+// Campo de formulario guiado por configuración (ver resources.config.js)
+const props = defineProps({
+  field: { type: Object, required: true },
+  form: { type: Object, required: true },
+  entity: Object, // registro cargado al editar (etiquetas de selectores e imagen actual)
+  options: { type: Object, default: () => ({}) },
+  get: { type: Function, required: true }, // error por campo
+  isEdit: Boolean,
+})
+
+const f = props.field
+const required = f.required || (f.requiredOnCreate && !props.isEdit)
+const value = () => getPath(props.form, f.key)
+const set = (v) => setPath(props.form, f.key, f.upper ? String(v).toUpperCase() : v)
+const initialLabel = () => (f.initialLabel && props.entity ? f.initialLabel(props.entity) ?? '' : '')
+const errorKey = f.type === 'location' ? f.idKey : f.key
+const labelOf = (o) => (f.optionLabel ? f.optionLabel(o) : o.name)
+</script>
+
+<template>
+  <FormField :label="f.label" :required="required" :hint="f.hint" :error="get(errorKey)">
+    <CFormSelect v-if="f.type === 'select'" :model-value="value()" :invalid="!!get(f.key)" @update:model-value="set">
+      <option value="">Selecciona...</option>
+      <option v-for="o in options[f.optionsKey]" :key="o.id" :value="o.id">{{ labelOf(o) }}</option>
+    </CFormSelect>
+    <RemoteSelect
+      v-else-if="f.type === 'remote'"
+      :model-value="value()"
+      :service="f.service"
+      :list-key="f.listKey"
+      :label-fn="f.labelFn"
+      :params="f.params"
+      :searchable="f.searchable !== false"
+      :initial-label="initialLabel()"
+      :invalid="!!get(f.key)"
+      @update:model-value="set"
+    />
+    <LocationPicker
+      v-else-if="f.type === 'location'"
+      v-model:type="form[f.typeKey]"
+      v-model:id="form[f.idKey]"
+      :initial-label="initialLabel()"
+      :invalid="!!get(f.idKey)"
+    />
+    <FileUpload
+      v-else-if="f.type === 'file'"
+      :model-value="value()"
+      :current-url="entity && f.urlFrom ? fileUrl(getPath(entity, f.urlFrom)) : ''"
+      :invalid="!!get(f.key)"
+      @update:model-value="set"
+    />
+    <CFormTextarea v-else-if="f.type === 'textarea'" :model-value="value()" rows="3" :maxlength="f.maxlength" :invalid="!!get(f.key)" @update:model-value="set" />
+    <CFormInput
+      v-else
+      :model-value="value()"
+      :type="f.type ?? 'text'"
+      :maxlength="f.maxlength"
+      :autocomplete="f.type === 'password' ? 'new-password' : undefined"
+      :invalid="!!get(f.key)"
+      @update:model-value="set"
+    />
+  </FormField>
+</template>

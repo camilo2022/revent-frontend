@@ -6,7 +6,7 @@ defineProps({ label: String, error: String, required: Boolean, hint: String })
 <template>
   <div class="mb-3">
     <label v-if="label" class="form-label">
-      {{ label }} <span v-if="required" class="text-danger">*</span>
+      {{ label }}<span v-if="required" class="text-danger" aria-label="obligatorio"> *</span>
     </label>
     <slot />
     <div v-if="hint && !error" class="form-text">{{ hint }}</div>
