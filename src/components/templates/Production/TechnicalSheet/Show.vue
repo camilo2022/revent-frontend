@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { cilHistory, cilPencil } from '@coreui/icons'
+import { cilHistory, cilIndustry, cilPencil } from '@coreui/icons'
 import TechnicalSheetService from '@/services/TechnicalSheetService'
 import { usePermissions } from '@/composables/usePermissions'
 import { confirmAction, notify, notifyError } from '@/utils/swal'
@@ -69,6 +69,9 @@ const run = async (action) => {
           <CButton color="secondary" variant="outline" size="sm" @click="emit('back')">Volver</CButton>
           <CButton v-if="can('technical_sheets.update') && status !== 'Cancelado'" color="primary" variant="outline" size="sm" @click="emit('edit')"><CIcon :icon="cilPencil" /> Editar</CButton>
           <CButton v-if="can('audits.all')" color="secondary" variant="outline" size="sm" @click="router.push('/audits')"><CIcon :icon="cilHistory" /> Ver historial de cambios</CButton>
+          <CButton v-if="status === 'Aprobado' && can('production_orders.store')" color="success" size="sm" title="Abre una orden nueva con esta ficha ya elegida" @click="router.push({ path: '/production_orders', query: { panel: 'create', technical_sheet_id: sheet.id } })">
+            <CIcon :icon="cilIndustry" /> Crear orden de producción con esta ficha
+          </CButton>
           <CButton v-for="a in actions" :key="a.key" :color="a.color" size="sm" :disabled="busy" @click="run(a)">{{ a.label }}</CButton>
         </div>
       </CCardHeader>

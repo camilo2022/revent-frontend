@@ -1,10 +1,12 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import ProductionOrderService from '@/services/ProductionOrderService'
 import TechnicalSheetService from '@/services/TechnicalSheetService'
 import { useOptions } from '@/composables/useOptions'
 import { useServerErrors } from '@/composables/useServerErrors'
 import { money } from '@/utils/format'
+import { notify, notifyError } from '@/utils/swal'
 import { cell, ensureStore, lineTotal, newLine } from '@/utils/orderMatrix'
 import FormField from '@/components/UI/templates/FormField.vue'
 import LoadingForm from '@/components/UI/templates/Skeleton.vue'
@@ -18,6 +20,7 @@ const props = defineProps({ id: [String, Number] })
 const emit = defineEmits(['saved', 'cancel'])
 const { options, loadOptions } = useOptions()
 const { errors, message, get, clear, handle } = useServerErrors()
+const route = useRoute()
 
 const loading = ref(true)
 const saving = ref(false)
@@ -101,6 +104,12 @@ onMounted(async () => {
       if (!(await loadOrder())) return
     } else {
       sheets.value = (await TechnicalSheetService.all({ only_approved: 1 })).data.technical_sheets
+      // Llegó desde el detalle de una ficha aprobada: la deja elegida
+      const preset = Number(route.query.technical_sheet_id)
+      if (preset && sheets.value.some((s) => s.id === preset)) {
+        form.technical_sheet_id = preset
+        await loadSheet(preset)
+      }
     }
   } catch (error) {
     handle(error)
@@ -165,7 +174,10 @@ const save = async () => {
   try {
     const body = buildPayload()
     const res = props.id ? await ProductionOrderService.update(props.id, body) : await ProductionOrderService.store(body)
-    emit('saved', res.data.production_order?.id ?? props.id)
+    const saved = res.data?.production_order
+    // Mensaje en lenguaje de negocio: "Orden PO-000012 creada"
+    if (saved?.consecutive) notify(`Orden ${saved.consecutive} ${props.id ? 'actualizada' : 'creada'} con ${totals.value.pairs} pares.`)
+    emit('saved', saved?.id ?? props.id)
   } catch (error) {
     handle(error)
     mapErrors()
