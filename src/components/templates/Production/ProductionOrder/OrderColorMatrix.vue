@@ -1,7 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { cilCopy, cilPlus, cilTrash, cilChartLine } from '@coreui/icons'
-import { cell, colTotal, ensureStore, lineTotal, removeStore, rowTotal } from '@/utils/orderMatrix'
+import { applyPastedBlock, cell, colTotal, ensureStore, lineTotal, matrixToText, parsePastedBlock, removeStore, rowTotal } from '@/utils/orderMatrix'
+import { useAlertStore } from '@/stores/alertStore'
 import StorePickerModal from './StorePickerModal.vue'
 import CurveModal from './CurveModal.vue'
 
@@ -39,6 +40,36 @@ const applyCurve = ({ storeIds, values }) => {
   storeIds.forEach((st) => sizes.value.forEach((s) => (props.line.qty[st][s.id] = values[s.id])))
   curveOpen.value = false
 }
+
+// Pegar un bloque de Excel/Sheets (filas = tiendas, columnas = tallas) desde la celda donde está el cursor
+const alerts = useAlertStore()
+const onPaste = (storeIndex, sizeIndex, event) => {
+  const text = event.clipboardData?.getData('text/plain') ?? ''
+  if (!text.includes('\t') && !text.includes('\n')) return // un solo valor: lo maneja el input normal
+  event.preventDefault()
+  const { rows, ignored } = parsePastedBlock(text)
+  const { written, outside } = applyPastedBlock(props.line, sizes.value, storeIndex, sizeIndex, rows)
+  const avisos = []
+  if (ignored.length) avisos.push(`${ignored.length} celda(s) no eran números enteros y se ignoraron (${ignored.slice(0, 3).join('; ')}${ignored.length > 3 ? '…' : ''})`)
+  if (outside) avisos.push(`${outside} valor(es) quedaron fuera de la matriz: agrega más tiendas o revisa el orden de las tallas`)
+  if (written) alerts.success(`Se pegaron ${written} cantidad(es) en ${props.color.color?.name ?? 'el color'}.`)
+  avisos.forEach((m) => alerts.addAlert({ type: 'warning', message: m, duration: 8000 }))
+  if (!written && !avisos.length) alerts.addAlert({ type: 'warning', message: 'No se encontraron cantidades para pegar.' })
+}
+
+// Copia la matriz al portapapeles con tabuladores (se pega directo en Excel)
+const copying = ref(false)
+const copyMatrix = async () => {
+  copying.value = true
+  try {
+    await navigator.clipboard.writeText(matrixToText(props.line, sizes.value, storeLabel))
+    alerts.success('Matriz copiada. Pégala en Excel con Ctrl+V.')
+  } catch {
+    alerts.error('No se pudo copiar al portapapeles. Selecciona las celdas y copia manualmente.')
+  } finally {
+    copying.value = false
+  }
+}
 </script>
 
 <template>
@@ -52,10 +83,16 @@ const applyCurve = ({ storeIds, values }) => {
       <CButton color="primary" variant="outline" size="sm" :disabled="!line.stores.length" @click="emit('copy')">
         <CIcon :icon="cilCopy" /> Copiar a otras tiendas/colores
       </CButton>
+      <CButton color="secondary" variant="outline" size="sm" :disabled="!line.stores.length || copying" title="Copia la tabla para pegarla en Excel" @click="copyMatrix">
+        <CSpinner v-if="copying" size="sm" class="me-1" /><CIcon v-else :icon="cilCopy" /> Copiar la matriz
+      </CButton>
     </div>
 
     <p v-if="!line.stores.length" class="text-body-secondary mb-0">Agrega tiendas para ingresar las cantidades por talla.</p>
-    <div v-else class="table-responsive">
+    <p v-else class="form-text mt-0 mb-2">
+      Puedes pegar desde Excel: copia el bloque de cantidades (filas = tiendas en el mismo orden, columnas = tallas), haz clic en la primera celda y presiona Ctrl+V.
+    </p>
+    <div v-if="line.stores.length" class="table-responsive">
       <table class="table table-sm table-bordered matrix-table mb-0">
         <thead>
           <tr>
@@ -66,17 +103,18 @@ const applyCurve = ({ storeIds, values }) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="st in line.stores" :key="st">
+          <tr v-for="(st, si) in line.stores" :key="st">
             <td class="store-col">{{ storeLabel(st) }}</td>
-            <td v-for="s in sizes" :key="s.id">
+            <td v-for="(s, zi) in sizes" :key="s.id">
               <CFormInput
                 size="sm"
                 type="number"
                 min="0"
                 :model-value="cell(line, st, s.id) || ''"
                 :invalid="!!cellErrors[`${st}:${s.id}`]"
-                :title="cellErrors[`${st}:${s.id}`]"
+                :title="cellErrors[`${st}:${s.id}`] || 'Puedes pegar aquí un bloque copiado de Excel'"
                 @update:model-value="setCell(st, s.id, $event)"
+                @paste="onPaste(si, zi, $event)"
               />
             </td>
             <td class="fw-semibold">{{ rowTotal(line, st, sizes) }}</td>

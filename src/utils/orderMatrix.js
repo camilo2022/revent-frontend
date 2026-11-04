@@ -64,6 +64,54 @@ export function lineTotal(line, sizes) {
   return line.stores.reduce((acc, st) => acc + rowTotal(line, st, sizes), 0)
 }
 
+// Convierte un bloque copiado de Excel/Sheets (filas con tabulador) en una matriz de enteros >= 0.
+// Devuelve { rows: number[][], ignored: string[] }; las celdas que no son enteros >= 0 quedan en null
+export function parsePastedBlock(text) {
+  const lines = String(text ?? '').replace(/\r/g, '').split('\n').filter((l) => l.trim() !== '')
+  const ignored = []
+  const rows = lines.map((line, r) =>
+    line.split(/\t|;/).map((raw, c) => {
+      const t = raw.trim().replace(/\./g, '')
+      if (t === '') return 0
+      const n = Number(t)
+      if (!Number.isInteger(n) || n < 0) {
+        ignored.push(`fila ${r + 1}, columna ${c + 1}: "${raw.trim()}"`)
+        return null
+      }
+      return n
+    }),
+  )
+  return { rows, ignored }
+}
+
+// Pega el bloque a partir de (storeIndex, sizeIndex); devuelve cuántas celdas se escribieron y qué sobró
+export function applyPastedBlock(line, sizes, storeIndex, sizeIndex, rows) {
+  let written = 0
+  let outside = 0
+  rows.forEach((row, r) => {
+    const storeId = line.stores[storeIndex + r]
+    row.forEach((value, c) => {
+      const size = sizes[sizeIndex + c]
+      if (storeId == null || !size) {
+        outside++
+        return
+      }
+      if (value === null) return
+      ensureStore(line, storeId)
+      line.qty[storeId][size.id] = value
+      written++
+    })
+  })
+  return { written, outside }
+}
+
+// Texto con tabuladores para pegar en Excel (encabezado + una fila por tienda)
+export function matrixToText(line, sizes, storeLabel) {
+  const head = ['Tienda', ...sizes.map((s) => s.size?.name ?? ''), 'Total'].join('\t')
+  const body = line.stores.map((st) => [storeLabel(st), ...sizes.map((s) => cell(line, st, s.id)), rowTotal(line, st, sizes)].join('\t'))
+  return [head, ...body].join('\n')
+}
+
 // Copia la fila de una tienda a otra tienda/color emparejando por talla (size.id)
 export function copyRow(srcLine, srcStore, srcSizes, dstLine, dstStore, dstSizes) {
   ensureStore(dstLine, dstStore)
