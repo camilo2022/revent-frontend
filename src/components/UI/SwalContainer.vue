@@ -17,7 +17,7 @@ watch(
       showCancelButton: true,
       confirmButtonText: data.confirmText,
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#16a34a',
+      confirmButtonColor: '#321fdb',
       reverseButtons: true,
       focusCancel: data.icon === 'warning',
       customClass: { popup: 'swal-revent' },
