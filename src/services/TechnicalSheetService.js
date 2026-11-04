@@ -8,5 +8,4 @@ export default {
   reviewed: (id) => call(() => http.patch(`${base}/reviewed/${id}`, {})),
   approved: (id) => call(() => http.patch(`${base}/approved/${id}`, {})),
   canceled: (id) => call(() => http.patch(`${base}/canceled/${id}`, {})),
-  version: (id) => call(() => http.post(`${base}/version/${id}`, {})),
 }
