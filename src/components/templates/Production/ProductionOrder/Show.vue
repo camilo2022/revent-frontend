@@ -1,10 +1,7 @@
 <script setup>
-import { cilHistory } from '@coreui/icons'
+import { cilArrowLeft, cilBan, cilCheckAlt, cilHistory, cilPencil, cilSend } from '@coreui/icons'
 import AuditTimeline from '@/components/UI/templates/AuditTimeline.vue'
-import { cilCheckAlt, cilBan } from '@coreui/icons'
-import { cilArrowLeft } from '@coreui/icons'
 import { computed, onMounted, ref, watch } from 'vue'
-import { cilPencil } from '@coreui/icons'
 import ProductionOrderService from '@/services/ProductionOrderService'
 import { usePermissions } from '@/composables/usePermissions'
 import { confirmAction, notify, notifyError } from '@/utils/swal'
