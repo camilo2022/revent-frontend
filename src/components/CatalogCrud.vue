@@ -10,6 +10,8 @@ import { getPath, setPath } from '@/utils/paths'
 import Swal from 'sweetalert2'
 import DataTable from './DataTable.vue'
 import FormField from './FormField.vue'
+import RequiredNote from './RequiredNote.vue'
+import { useOptions } from '@/composables/useOptions'
 
 // CRUD genérico guiado por configuración (ver catalogs.config.js)
 const props = defineProps({ config: { type: Object, required: true } })
@@ -19,6 +21,7 @@ const perm = (action) => `${props.config.permission}.${action}`
 const filters = reactive({ with_trashed: false })
 const crud = useCrud(props.config.service, props.config.listKey, { extra: filters })
 const { errors, get, clear, handle } = useServerErrors()
+const { options, loadOptions } = useOptions()
 
 const modal = ref(false)
 const editingId = ref(null)
@@ -28,7 +31,7 @@ const form = reactive({})
 // Valores iniciales del formulario a partir de los campos configurados
 const fillForm = (row) => {
   Object.keys(form).forEach((k) => delete form[k])
-  props.config.fields.forEach((f) => setPath(form, f.key, row ? getPath(row, f.key) ?? '' : ''))
+  props.config.fields.forEach((f) => setPath(form, f.key, row ? getPath(row, f.from ?? f.key) ?? '' : ''))
 }
 
 const openCreate = () => {
@@ -85,7 +88,12 @@ const restore = async (row) => {
   }
 }
 
-onMounted(crud.load)
+onMounted(() => {
+  // Listas para los campos tipo select (ej. área del cargo)
+  const keys = props.config.fields.filter((f) => f.optionsKey).map((f) => f.optionsKey)
+  if (keys.length) loadOptions(keys)
+  crud.load()
+})
 </script>
 
 <template>
@@ -128,6 +136,9 @@ onMounted(crud.load)
             </CButton>
           </template>
           <template v-else>
+            <RouterLink v-for="a in config.extraActions" :key="a.label" :to="a.to(row)">
+              <CButton v-if="can(a.permission)" color="info" variant="outline" size="sm" class="me-1" :title="a.label">{{ a.label }}</CButton>
+            </RouterLink>
             <CButton v-if="can(perm('update'))" color="primary" variant="outline" size="sm" class="me-1" title="Editar" @click="openEdit(row)">
               <CIcon :icon="cilPencil" />
             </CButton>
@@ -145,8 +156,17 @@ onMounted(crud.load)
     <form @submit.prevent="save">
       <CModalBody>
         <FormField v-for="f in config.fields" :key="f.key" :label="f.label" :required="f.required" :hint="f.hint" :error="get(f.key)">
+          <CFormSelect
+            v-if="f.type === 'select'"
+            :model-value="getPath(form, f.key)"
+            :invalid="!!errors[f.key]"
+            @update:model-value="onInput(f, $event)"
+          >
+            <option value="">Selecciona...</option>
+            <option v-for="o in options[f.optionsKey]" :key="o.id" :value="o.id">{{ o.name }}</option>
+          </CFormSelect>
           <CFormTextarea
-            v-if="f.type === 'textarea'"
+            v-else-if="f.type === 'textarea'"
             :model-value="getPath(form, f.key)"
             rows="3"
             :invalid="!!errors[f.key]"
@@ -160,6 +180,7 @@ onMounted(crud.load)
             @update:model-value="onInput(f, $event)"
           />
         </FormField>
+        <RequiredNote />
       </CModalBody>
       <CModalFooter>
         <CButton color="secondary" variant="outline" @click="modal = false">Cancelar</CButton>
