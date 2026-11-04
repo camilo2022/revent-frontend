@@ -124,7 +124,7 @@ const copyMatrix = async () => {
           </tr>
         </tbody>
         <tfoot>
-          <tr class="table-light fw-semibold">
+          <tr class="matrix-total fw-semibold">
             <td class="store-col">Total por talla</td>
             <td v-for="s in sizes" :key="s.id">{{ colTotal(line, s.id) }}</td>
             <td>{{ lineTotal(line, sizes) }}</td>

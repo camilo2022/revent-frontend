@@ -51,6 +51,8 @@ body {
   text-align: left;
   min-width: 10rem;
 }
+// Fila de totales con color del tema (antes table-light, que quedaba claro en modo oscuro)
+.matrix-table .matrix-total td { background-color: var(--cui-tertiary-bg); }
 .spec-pre {
   white-space: pre-wrap;
 }

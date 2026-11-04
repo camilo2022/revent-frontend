@@ -32,7 +32,7 @@ const colTotal = (sizeId) => props.detail.stores.reduce((a, st) => a + qty(st, s
         </tr>
       </tbody>
       <tfoot>
-        <tr class="table-light fw-semibold">
+        <tr class="matrix-total fw-semibold">
           <td class="store-col">Total por talla</td>
           <td v-for="s in sizes" :key="s.id">{{ colTotal(s.id) }}</td>
           <td>{{ detail.total }}</td>
