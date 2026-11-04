@@ -38,7 +38,7 @@ watch(() => props.ctrl.mode, (m) => m === 'index' && loadCounts())
       <CNav variant="pills" class="gap-1">
         <CNavItem v-for="[v, l] in tabs" :key="v">
           <CNavLink href="#" :active="ctrl.filters.status === v" @click.prevent="pick(v)">
-            {{ l }} <CBadge v-if="counts[v] != null" color="light" text-color="dark" shape="rounded-pill" class="ms-1">{{ counts[v] }}</CBadge>
+            {{ l }} <CBadge v-if="counts[v] != null" color="secondary" shape="rounded-pill" class="ms-1">{{ counts[v] }}</CBadge>
           </CNavLink>
         </CNavItem>
       </CNav>
