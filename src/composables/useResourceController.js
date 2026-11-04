@@ -143,6 +143,13 @@ export function useResourceController({ service, Model, configuration: config, f
   }
 
   const save = async () => {
+    const editing = mode.value === 'edit'
+    const ok = await swal.confirm({
+      title: editing ? '¿Desea actualizar este registro?' : '¿Desea guardar este registro?',
+      text: editing ? `Se actualizarán los datos de ${config.singular}.` : `Se creará ${config.singular}.`,
+      confirmText: editing ? 'Sí, actualizar' : 'Sí, guardar',
+    })
+    if (!ok) return
     saving.value = true
     serverErrors.clear()
     const payload = buildPayload()
@@ -160,8 +167,8 @@ export function useResourceController({ service, Model, configuration: config, f
   }
 
   // Eliminar / restaurar con confirmación
-  const act = async (row, { fn, title, done }) => {
-    if (!(await swal.confirm({ title, text: row.name ?? row.username ?? '', icon: 'warning', confirmText: 'Sí, continuar' }))) return
+  const act = async (row, { fn, title, confirmText }) => {
+    if (!(await swal.confirm({ title, text: row.name ?? row.username ?? row.code ?? '', icon: 'warning', confirmText }))) return
     try {
       await service[fn](row.id)
       load()
@@ -169,8 +176,8 @@ export function useResourceController({ service, Model, configuration: config, f
       serverErrors.handle(error)
     }
   }
-  const remove = (row) => act(row, { fn: 'delete', title: `¿Eliminar ${config.singular}?`, done: 'Eliminado correctamente' })
-  const restore = (row) => act(row, { fn: 'restore', title: `¿Restaurar ${config.singular}?`, done: 'Restaurado correctamente' })
+  const remove = (row) => act(row, { fn: 'delete', title: `¿Desea inactivar este registro de ${config.singular}?`, confirmText: 'Sí, inactivar' })
+  const restore = (row) => act(row, { fn: 'restore', title: `¿Desea restaurar este registro de ${config.singular}?`, confirmText: 'Sí, restaurar' })
 
   // Paginación, búsqueda (con retardo), tamaño y orden
   let timer = null

@@ -9,7 +9,7 @@ import { useOptions } from '@/composables/useOptions'
 import { useServerErrors } from '@/composables/useServerErrors'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import { money } from '@/utils/format'
-import { notify, notifyError } from '@/utils/swal'
+import { notify, notifyError, confirmAction } from '@/utils/swal'
 import { cell, ensureStore, lineTotal, newLine } from '@/utils/orderMatrix'
 import FormField from '@/components/UI/templates/FormField.vue'
 import LoadingForm from '@/components/UI/templates/Skeleton.vue'
@@ -175,6 +175,13 @@ const mapErrors = () => {
 }
 
 const save = async () => {
+  const editing = !!props.id
+  const ok = await confirmAction({
+    title: editing ? '¿Desea actualizar la orden de producción?' : '¿Desea guardar la orden de producción?',
+    text: editing ? 'Se actualizarán los datos.' : 'Se creará el registro.',
+    confirmText: editing ? 'Sí, actualizar' : 'Sí, guardar',
+  })
+  if (!ok) return
   saving.value = true
   clear()
   try {

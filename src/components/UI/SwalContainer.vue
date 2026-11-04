@@ -23,7 +23,7 @@ watch(
       focusCancel: data.icon === 'warning',
       customClass: { popup: 'swal-revent' },
     })
-    if (!result.isConfirmed) useAlertStore().warning('Acción cancelada.')
+    if (!result.isConfirmed) useAlertStore().warning('Operación cancelada con éxito.')
     store.resolveSwal(result.isConfirmed)
   },
 )

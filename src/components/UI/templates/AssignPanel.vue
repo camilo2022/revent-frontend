@@ -1,4 +1,5 @@
 <script setup>
+import { confirmAction } from '@/utils/swal'
 import { cilArrowLeft } from '@coreui/icons'
 import { computed, onMounted, ref } from 'vue'
 import UserService from '@/services/UserService'
@@ -60,6 +61,12 @@ const apply = async (item, checked) => {
 
 const run = async (list, checked) => {
   if (!canEdit.value) return
+  const ok = await confirmAction({
+    title: checked ? '¿Desea asignar?' : '¿Desea quitar?',
+    text: list.length === 1 ? list[0].label : `Se ${checked ? 'asignarán' : 'quitarán'} ${list.length} elementos.`,
+    confirmText: checked ? 'Sí, asignar' : 'Sí, quitar',
+  })
+  if (!ok) return
   busy.value = true
   alerts.muted = true
   try {

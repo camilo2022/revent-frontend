@@ -1,4 +1,5 @@
 <script setup>
+import { confirmAction } from '@/utils/swal'
 import ComboSelect from '@/components/UI/templates/ComboSelect.vue'
 import { cilSave } from '@coreui/icons'
 import { computed, onMounted, reactive, ref } from 'vue'
@@ -70,6 +71,13 @@ const specsObject = () =>
   Object.fromEntries(specs.value.filter((r) => r.key.trim()).map((r) => [r.key.trim(), r.value]))
 
 const save = async () => {
+  const editing = !!props.id
+  const ok = await confirmAction({
+    title: editing ? '¿Desea actualizar la ficha técnica?' : '¿Desea guardar la ficha técnica?',
+    text: editing ? 'Se actualizarán los datos.' : 'Se creará el registro.',
+    confirmText: editing ? 'Sí, actualizar' : 'Sí, guardar',
+  })
+  if (!ok) return
   saving.value = true
   clear()
   const body = { ...form, specifications: specsObject() }

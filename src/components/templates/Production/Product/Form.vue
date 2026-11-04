@@ -61,6 +61,13 @@ onMounted(async () => {
 })
 
 const save = async () => {
+  const editing = !!props.id
+  const ok = await confirmAction({
+    title: editing ? '¿Desea actualizar el producto?' : '¿Desea guardar el producto?',
+    text: editing ? 'Se actualizarán los datos.' : 'Se creará el registro.',
+    confirmText: editing ? 'Sí, actualizar' : 'Sí, guardar',
+  })
+  if (!ok) return
   saving.value = true
   clear()
   const body = {
