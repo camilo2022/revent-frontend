@@ -9,12 +9,6 @@ defineProps({ ctrl: { type: Object, required: true } })
 
 <template>
   <ResourceScreen :ctrl="ctrl" :config="configuration">
-    <template #filters>
-      <CFormSelect v-model="ctrl.filters.collection_id" style="max-width: 220px" aria-label="Todas las colecciones" @change="ctrl.refresh()">
-        <option value="">Todas las colecciones</option>
-        <option v-for="o in ctrl.options.collections" :key="o.id" :value="o.id">{{ o.name }}</option>
-      </CFormSelect>
-    </template>
     <template #form="{ ctrl: c }">
       <Form :id="c.current?.id" @saved="c.saved(true)" @cancel="c.goIndex()" />
     </template>

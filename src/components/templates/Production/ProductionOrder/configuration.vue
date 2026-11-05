@@ -1,9 +1,9 @@
 <script>
 import { date } from '@/utils/format'
-// Órdenes de producción: filtros por estado y proveedor
+// Órdenes de producción
 export const configuration = {
   title: 'Órdenes de producción', singular: 'orden', permission: 'production_orders', listKey: 'production_orders', customForm: true, customShow: true,
-  show: true, noDelete: true, optionKeys: ['suppliers'], valueFilters: { status: '', supplier_id: '' },
+  show: true, noDelete: true,
   columns: [
     { key: 'consecutive', label: 'Consecutivo', sortable: true },
     { key: 'supplier', label: 'Proveedor', value: (r) => r.supplier?.trade_name || r.supplier?.legal_name || '-' },

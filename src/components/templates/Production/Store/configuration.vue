@@ -9,7 +9,7 @@ export const configuration = {
     { key: 'address', label: 'Dirección' }, { key: 'location', label: 'Ubicación', value: (r) => r.location?.name ?? '-' },
   ],
   fields: [
-    { key: 'code', label: 'Código (2 caracteres)', required: true, maxlength: 2 },
+    { key: 'code', label: 'Código', required: true, maxlength: 2 },
     { key: 'name', label: 'Nombre', required: true, maxlength: 100 },
     contactFields[0], contactFields[1], contactFields[2],
   ],

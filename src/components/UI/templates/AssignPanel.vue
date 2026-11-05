@@ -4,16 +4,14 @@ import { cilArrowLeft } from '@coreui/icons'
 import { computed, onMounted, ref } from 'vue'
 import UserService from '@/services/UserService'
 import PositionService from '@/services/PositionService'
-import CategoryService from '@/services/CategoryService'
-import PermissionService from '@/services/PermissionService'
-import SubcategoryService from '@/services/SubcategoryService'
+import RoleService from '@/services/RoleService'
 import { useAuthStore } from '@/stores/authStore'
 import { useAlertStore } from '@/stores/alertStore'
 import { errorMessage, firstOf, listOf } from '@/utils/format'
 import CheckList from './CheckList.vue'
 import Skeleton from './Skeleton.vue'
 
-// Asignar/quitar permisos (usuarios, cargos) o subcategorías (categorías) con casillas.
+// Asignar/quitar permisos (usuarios, cargos) con casillas.
 // Cada casilla llama a la API de inmediato (assign / remove).
 const props = defineProps({ kind: { type: String, required: true }, record: { type: Object, required: true } })
 defineEmits(['back'])
@@ -21,9 +19,8 @@ const auth = useAuthStore()
 const alerts = useAlertStore()
 
 const kinds = {
-  users: { title: 'Permisos del usuario', service: UserService, field: 'permission_id', allService: PermissionService, allKey: 'permissions', perm: 'users.authorization', name: (e) => e.username },
-  positions: { title: 'Permisos del cargo', service: PositionService, field: 'permission_id', allService: PermissionService, allKey: 'permissions', perm: 'organizational_structure.areas.positions.authorization', name: (e) => e.name },
-  categories: { title: 'Subcategorías de la categoría', service: CategoryService, field: 'subcategory_id', allService: SubcategoryService, allKey: 'subcategories', perm: 'classification.categories.subcategories', name: (e) => e.name },
+  users: { title: 'Permisos del usuario', service: UserService, field: 'permission_id', allService: RoleService, allKey: 'permissions', perm: 'users.authorization', name: (e) => e.username },
+  positions: { title: 'Permisos del cargo', service: PositionService, field: 'permission_id', allService: RoleService, allKey: 'permissions', perm: 'organizational_structure.areas.positions.authorization', name: (e) => e.name },
 }
 const k = kinds[props.kind]
 
@@ -38,7 +35,8 @@ onMounted(async () => {
   try {
     entity.value = firstOf(await k.service.find(props.record.id))
     selected.value = (entity.value[k.allKey] ?? []).map((x) => x.id)
-    const all = listOf(await k.allService.all(props.kind === 'categories' ? { with_trashed: 0 } : {}), k.allKey)
+    // Los permisos salen de los roles (cada rol trae los suyos)
+    const all = (listOf(await k.allService.all({}), 'roles')).flatMap((r) => (r.permissions ?? []).map((p) => ({ ...p, role: r })))
     // Permisos agrupados por rol; subcategorías sin grupo
     items.value = all.map((x) => ({
       id: x.id,

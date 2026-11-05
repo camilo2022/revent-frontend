@@ -41,7 +41,7 @@ const fallback = [
   ] },
   { name: 'Catálogos', items: [
     item('Colores', '/colors', 'colors.all'), item('Tallas', '/sizes', 'sizes.all'), item('Marcas', '/trademarks', 'trademarks.all'),
-    item('Categorías', '/categories', 'classification.categories.all'), item('Subcategorías', '/subcategories', 'classification.subcategories.all'),
+    item('Categorías', '/categories', 'categorization.categories.all'),
   ] },
   { name: 'Comercial', items: [item('Proveedores', '/suppliers', 'suppliers.all'), item('Tiendas', '/stores', 'stores.all')] },
   { name: 'Reportes', items: [item('Reportes', '/reports', 'reports.all')] },
@@ -54,10 +54,9 @@ const fallback = [
     item('Administradoras de riesgos', '/risk_managers', 'risk_managers.all'), item('Entidades de salud', '/health_entities', 'health_entities.all'),
     item('Cajas de compensación', '/compensation_funds', 'compensation_funds.all'), item('Fondos de pensión', '/pension_funds', 'pension_funds.all'),
     item('Tipos de archivo', '/file_types', 'file_types.all'), item('Tipos de persona', '/person_types', 'identification.person_types.all'),
-    item('Tipos de documento', '/document_types', 'identification.document_types.all'),
   ] },
   { name: 'Configuración', items: [
-    item('Usuarios', '/users', 'users.all'), item('Roles', '/roles', 'authorization.roles.all'), item('Permisos', '/permissions', 'authorization.permissions.all'),
+    item('Usuarios', '/users', 'users.all'), item('Roles', '/roles', 'authorization.roles.all'),
     item('Módulos', '/modules', 'navegation.modules.all'),
   ] },
 ]

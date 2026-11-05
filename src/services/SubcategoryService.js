@@ -1,3 +1,3 @@
-import { createService } from './BaseService'
+import { createChildService } from './BaseService'
 
-export default createService('/classification/subcategories')
+export default createChildService('/categorization/categories/subcategories', 'category_id')

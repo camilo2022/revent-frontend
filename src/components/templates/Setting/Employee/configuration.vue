@@ -4,7 +4,6 @@ import { personName, personLabel, date } from '@/utils/configHelpers'
 // Campos, columnas y filtros del recurso (lo leen el controlador y las plantillas)
 export const configuration = {
   title: 'Empleados', singular: 'empleado', permission: 'employees', listKey: 'employees', withTrashed: true, formMode: 'page',
-  filters: [{ key: 'with_user', label: 'Solo con usuario' }],
   optionKeys: ['positions', 'risk_managers', 'health_entities', 'pension_funds', 'compensation_funds'],
   columns: [
     { key: 'person_id', label: 'Persona', value: (r) => personName(r.person) },

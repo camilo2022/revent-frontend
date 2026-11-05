@@ -1,3 +1,3 @@
 import { createService } from './BaseService'
 
-export default createService('/classification/collections')
+export default createService('/collections')

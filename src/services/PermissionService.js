@@ -1,3 +1,3 @@
-import { createService } from './BaseService'
+import { createChildService } from './BaseService'
 
-export default createService('/authorization/permissions')
+export default createChildService('/authorization/roles/permissions', 'role_id')

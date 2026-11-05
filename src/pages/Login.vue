@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { useServerErrors } from '@/composables/useServerErrors'
 import FormField from '@/components/UI/templates/FormField.vue'
 import RequiredNote from '@/components/UI/templates/RequiredNote.vue'
-import logo from '@/assets/brand/revent-logo.png'
+import logo from '@/assets/brand/techrevent-logo.png'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -35,8 +35,7 @@ const submit = async () => {
           <CCard class="p-4">
             <CCardBody>
               <div class="text-center mb-4">
-                <img :src="logo" alt="Revent" class="brand-logo-img brand-logo-img-lg mb-2" />
-                <h4 class="mb-0">TechRevent</h4>
+                <img :src="logo" alt="TechRevent" class="brand-logo-img mb-3" style="max-height: 96px" />
                 <small class="text-body-secondary">Inicia sesión para continuar</small>
               </div>
               <CAlert v-if="message" color="danger" class="py-2">{{ message }}</CAlert>

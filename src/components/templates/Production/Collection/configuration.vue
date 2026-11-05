@@ -6,8 +6,8 @@ export const configuration = {
     { key: 'name', label: 'Nombre', required: true, upper: true, maxlength: 60 },
     { key: 'description', label: 'Descripción', type: 'textarea', maxlength: 255 },
     // Año y código viajan dentro de `settings` (igual que el código de Colores y Tallas)
-    { key: 'settings.year', label: 'Año (2 dígitos)', required: true, maxlength: 2, hint: 'Los dos últimos dígitos del año. Ej. 26' },
-    { key: 'settings.code', label: 'Código (1 dígito)', required: true, maxlength: 1, hint: 'Número de la colección dentro del año. Ej. 5' },
+    { key: 'settings.year', label: 'Año', required: true, maxlength: 2, hint: 'Los dos últimos dígitos del año. Ej. 26' },
+    { key: 'settings.code', label: 'Código', required: true, maxlength: 1, hint: 'Número de la colección dentro del año. Ej. 5' },
   ],
   columns: [
     { key: 'name', label: 'Nombre' },

@@ -1,9 +1,9 @@
 <script>
 import { date } from '@/utils/format'
-// Fichas técnicas: filtros por estado y producto (se dibujan en TechnicalSheet.vue)
+// Fichas técnicas
 export const configuration = {
   title: 'Fichas técnicas', singular: 'ficha técnica', permission: 'technical_sheets', listKey: 'technical_sheets', customForm: true, customShow: true,
-  show: true, noDelete: true, optionKeys: ['products'], valueFilters: { status: '', product_id: '' },
+  show: true, noDelete: true,
   columns: [
     { key: 'product', label: 'Producto', value: (r) => `${r.product?.code ?? ''} · ${r.product?.name ?? ''}` },
     { key: 'status', label: 'Estado', sortable: true, type: 'status' },

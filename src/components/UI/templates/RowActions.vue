@@ -33,7 +33,7 @@ const hint = (allowed, text) => (allowed ? text : 'No tienes permiso para esta a
     </template>
     <template v-else-if="!config.readonly">
       <template v-for="a in config.extraActions" :key="a.label">
-        <CButton :disabled="!auth.can(a.permission)" color="dark" variant="outline" size="sm" :title="hint(auth.can(a.permission), a.label)" :aria-label="a.label" @click="ctrl.goPanel(a.panel, row)"><CIcon :icon="panelIcons[a.panel] ?? cilApplications" /></CButton>
+        <CButton :disabled="!auth.can(a.permission)" color="dark" variant="outline" size="sm" :title="hint(auth.can(a.permission), a.label)" :aria-label="a.label" @click="ctrl.goPanel(a.panel, row)"><CIcon :icon="a.sub ? cilList : (panelIcons[a.panel] ?? cilApplications)" /></CButton>
       </template>
       <CButton :disabled="!auth.can(perm('update'))" color="primary" variant="outline" size="sm" :title="hint(auth.can(perm('update')), title('Editar'))" :aria-label="title('Editar')" @click="ctrl.goEdit(row)"><CIcon :icon="cilPencil" /></CButton>
       <CButton v-if="!config.noDelete" :disabled="!auth.can(perm('delete'))" color="danger" variant="outline" size="sm" :title="hint(auth.can(perm('delete')), title('Eliminar'))" :aria-label="title('Eliminar')" @click="ctrl.remove(row)"><CIcon :icon="cilTrash" /></CButton>

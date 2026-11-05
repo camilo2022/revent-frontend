@@ -1,5 +1,5 @@
-import { assignService, createService } from './BaseService'
+import { createService } from './BaseService'
 
-const base = '/classification/categories'
+const base = '/categorization/categories'
 
-export default { ...createService(base), ...assignService('/classification/categories/subcategories') }
+export default createService(base)

@@ -5,6 +5,8 @@ import { date } from './format'
 // Campos: type text|textarea|date|email|password|select|remote|location|file; required marca el asterisco rojo.
 
 export const personName = (p) => `${p?.names ?? ''} ${p?.last_names ?? ''}`.trim() || '-'
+// Documento con el código del tipo (CC 1002003) en vez del nombre completo
+export const documentLabel = (r) => `${r?.document_type?.settings?.code ?? r?.document_type?.name ?? ''} ${r?.document ?? ''}`.trim()
 export const personLabel = (p) => `${p.names ?? ''} ${p.last_names ?? ''} (${p.document ?? ''})`.trim()
 export const countryLabel = (c) => `${c.name}${c.phone_code ? ` (+${c.phone_code})` : ''}`
 export const yesNo = (v) => (v ? 'Sí' : 'No')
@@ -36,7 +38,7 @@ export function simpleConfig({
   }
 }
 
-export const codeField = { key: 'settings.code', label: 'Código (2 letras)', required: true, maxlength: 2, upper: true }
+export const codeField = { key: 'settings.code', label: 'Código', required: true, maxlength: 2, upper: true }
 export const codeColumn = { key: 'settings.code', label: 'Código' }
 
 // Campos de contacto que comparten personas y proveedores
@@ -45,12 +47,12 @@ export const contactFields = [
   { key: 'address', label: 'Dirección', required: true, maxlength: 255 },
   { key: 'neighborhood', label: 'Barrio', required: true, maxlength: 255 },
   { key: 'phone_country_id', type: 'remote', service: CountryService, labelFn: countryLabel, label: 'País del teléfono', required: true, initialLabel: (e) => e?.phone_country?.name },
-  { key: 'phone', label: 'Teléfono (10 dígitos)', required: true, maxlength: 10 },
+  { key: 'phone', label: 'Teléfono', required: true, maxlength: 10 },
   { key: 'email', type: 'email', label: 'Correo', required: true, maxlength: 255 },
 ]
 export const documentFields = [
   { key: 'document_type_id', type: 'select', optionsKey: 'document_types', label: 'Tipo de documento', required: true },
-  { key: 'document', label: 'Documento (5 a 14 dígitos)', required: true, maxlength: 14 },
+  { key: 'document', label: 'Documento', required: true, maxlength: 14 },
 ]
 export const contactShow = [
   { label: 'Ubicación', value: (e) => e.location?.name },

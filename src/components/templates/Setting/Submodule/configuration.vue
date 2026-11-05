@@ -9,9 +9,9 @@ export const configuration = {
   ],
   fields: [
     { key: 'permission_id', type: 'select', optionsKey: 'permissions', optionLabel: (o) => `${o.title} (${o.name})`, label: 'Permiso', required: true },
-    { key: 'name', label: 'Nombre (máx. 18 letras)', required: true, maxlength: 18 },
-    { key: 'url', label: 'URL (ej. /people)', required: true, maxlength: 40 },
-    { key: 'icon', label: 'Ícono (ej. FaUsers)', required: true, maxlength: 40 },
+    { key: 'name', label: 'Nombre', required: true, maxlength: 18 },
+    { key: 'url', label: 'URL', required: true, maxlength: 40 },
+    { key: 'icon', label: 'Ícono', required: true, maxlength: 40 },
   ],
   show: [
     { label: 'Nombre', value: (e) => e.name }, { label: 'URL', value: (e) => e.url }, { label: 'Ícono', value: (e) => e.icon },

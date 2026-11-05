@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { cilHistory, cilPencil } from '@coreui/icons'
+import Avatar from './Avatar.vue'
 import AuditTimeline from './AuditTimeline.vue'
 import { useAuthStore } from '@/stores/authStore'
 import Button from './Button.vue'
@@ -28,7 +29,7 @@ const canEdit = () => !props.config.readonly && auth.can(`${props.config.permiss
       <CRow>
         <CCol v-for="f in config.show" :key="f.label" :md="f.type === 'list' ? 12 : 4" class="mb-3">
           <small class="text-body-secondary d-block">{{ f.label }}</small>
-          <img v-if="f.type === 'photo'" :src="f.value(ctrl.current)" alt="" class="rounded border" style="width: 96px; height: 96px; object-fit: cover" @error="$event.target.style.display = 'none'" />
+          <Avatar v-if="f.type === 'photo'" :src="f.value(ctrl.current)" :names="f.names?.(ctrl.current)" :last-names="f.lastNames?.(ctrl.current)" :size="96" />
           <ul v-else-if="f.type === 'list'" class="mb-0 ps-3">
             <li v-for="item in f.value(ctrl.current)" :key="item">{{ item }}</li>
             <li v-if="!f.value(ctrl.current).length" class="list-unstyled text-body-secondary">Ninguno</li>

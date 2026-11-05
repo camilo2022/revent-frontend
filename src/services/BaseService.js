@@ -35,6 +35,17 @@ export function createService(base) {
   }
 }
 
+// Servicio de registros hijos (subcategorías de una categoría, tipos de documento de un tipo de persona, permisos de un rol):
+// siempre se consulta por el id del padre, que va en la ruta: {base}/all/{parentId}; en store/update va en el cuerpo.
+export function createChildService(base, parentKey) {
+  const service = createService(base)
+  return {
+    ...service,
+    parentKey,
+    all: ({ [parentKey]: parentId, ...params } = {}) => call(() => http.get(`${base}/all/${parentId}`, { params })),
+  }
+}
+
 // assign/remove (permisos o subcategorías): POST {path}/assign/{id}
 export function assignService(path) {
   return {

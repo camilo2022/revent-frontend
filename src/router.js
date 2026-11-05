@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/authStore'
 const resources = {
   Setting: {
     users: ['User', 'Usuarios', 'users.all'], people: ['Person', 'Personas', 'people.all'], employees: ['Employee', 'Empleados', 'employees.all'],
-    roles: ['Role', 'Roles', 'authorization.roles.all'], permissions: ['Permission', 'Permisos', 'authorization.permissions.all'],
+    roles: ['Role', 'Roles', 'authorization.roles.all'],
     modules: ['Module', 'Módulos', 'navegation.modules.all'],
   },
   Administration: {
@@ -14,13 +14,13 @@ const resources = {
     risk_managers: ['RiskManager', 'Administradoras de riesgos', 'risk_managers.all'], health_entities: ['HealthEntity', 'Entidades de salud', 'health_entities.all'],
     compensation_funds: ['CompensationFund', 'Cajas de compensación', 'compensation_funds.all'], pension_funds: ['PensionFund', 'Fondos de pensión', 'pension_funds.all'],
     file_types: ['FileType', 'Tipos de archivo', 'file_types.all'], person_types: ['PersonType', 'Tipos de persona', 'identification.person_types.all'],
-    document_types: ['DocumentType', 'Tipos de documento', 'identification.document_types.all'], locations: ['Location', 'Ubicaciones', ''],
+    locations: ['Location', 'Ubicaciones', ''],
   },
   Production: {
     collections: ['Collection', 'Colecciones', 'collections.all'], products: ['Product', 'Productos', 'products.all'],
     technical_sheets: ['TechnicalSheet', 'Fichas técnicas', 'technical_sheets.all'], production_orders: ['ProductionOrder', 'Órdenes de producción', 'production_orders.all'],
     colors: ['Color', 'Colores', 'colors.all'], sizes: ['Size', 'Tallas', 'sizes.all'], trademarks: ['Trademark', 'Marcas', 'trademarks.all'],
-    categories: ['Category', 'Categorías', 'classification.categories.all'], subcategories: ['Subcategory', 'Subcategorías', 'classification.subcategories.all'],
+    categories: ['Category', 'Categorías', 'categorization.categories.all'],
     suppliers: ['Supplier', 'Proveedores', 'suppliers.all'], stores: ['Store', 'Tiendas', 'stores.all'],
     reports: ['Report', 'Reportes', 'reports.all'],
   },
