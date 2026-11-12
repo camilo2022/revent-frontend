@@ -62,6 +62,10 @@ const labelOf = (o) => (f.optionLabel ? f.optionLabel(o) : o.name)
       :invalid="!!get(f.key)"
       @update:model-value="set"
     />
+    <div v-else-if="f.type === 'color'" class="d-flex gap-2">
+      <input type="color" class="form-control form-control-color flex-shrink-0" title="Elegir color" :value="value() || '#000000'" @input="set($event.target.value.toUpperCase())" />
+      <CFormInput :model-value="value()" placeholder="#RRGGBB" maxlength="7" :invalid="!!get(f.key)" @update:model-value="(v) => set(String(v).toUpperCase())" />
+    </div>
     <CFormTextarea v-else-if="f.type === 'textarea'" :model-value="value()" rows="3" :maxlength="f.maxlength" :invalid="!!get(f.key)" :autofocus="autofocus" @update:model-value="set" />
     <CFormInput
       v-else

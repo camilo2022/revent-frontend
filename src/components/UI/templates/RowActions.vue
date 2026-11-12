@@ -1,13 +1,13 @@
 <script setup>
 import { ref } from 'vue'
-import { cilHistory, cilApplications, cilList, cilLockLocked, cilSitemap, cilPencil, cilReload, cilSearch, cilTrash } from '@coreui/icons'
+import { cilHistory, cilApplications, cilHome, cilList, cilLockLocked, cilSitemap, cilPencil, cilReload, cilSearch, cilTrash } from '@coreui/icons'
 import { useAuthStore } from '@/stores/authStore'
 import AuditTimeline from './AuditTimeline.vue'
 
 // Acciones de una fila según la configuración y los permisos del usuario
 const props = defineProps({ ctrl: { type: Object, required: true }, config: { type: Object, required: true }, row: { type: Object, required: true } })
 // Ícono de cada acción extra según su panel
-const panelIcons = { permissions: cilLockLocked, submodules: cilList, subcategories: cilSitemap }
+const panelIcons = { permissions: cilLockLocked, submodules: cilList, subcategories: cilSitemap, stores: cilHome }
 const auth = useAuthStore()
 const auditOpen = ref(false)
 const rowTitle = () => props.row.name ?? props.row.code ?? props.row.consecutive ?? props.row.username ?? ''

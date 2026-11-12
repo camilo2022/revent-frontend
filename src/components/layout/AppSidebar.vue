@@ -4,11 +4,12 @@ import { useRoute, useRouter } from 'vue-router'
 import {
   cilSpeedometer, cilColorPalette, cilResizeBoth, cilTag, cilLayers, cilBasket, cilDescription, cilIndustry, cilCircle, cilSettings,
   cilBuilding, cilApplications, cilPeople, cilUser, cilLockLocked, cilShieldAlt, cilList, cilHistory, cilStorage, cilBriefcase,
-  cilMedicalCross, cilHome, cilFile, cilLocationPin, cilSitemap, cilCart, cilOptions, cilChartPie,
+  cilMedicalCross, cilHome, cilFile, cilLocationPin, cilSitemap, cilCart, cilOptions, cilChartPie, cilSync,
 } from '@coreui/icons'
 import { useAuthStore } from '@/stores/authStore'
 import { useUiStore } from '@/stores/uiStore'
 import logo from '@/assets/brand/revent-logo-white.png'
+import { integrationScreens } from '@/config/integrationScreens'
 
 const auth = useAuthStore()
 const ui = useUiStore()
@@ -23,10 +24,13 @@ const icons = {
   '/genders': cilPeople, '/blood_types': cilMedicalCross, '/risk_managers': cilShieldAlt, '/health_entities': cilMedicalCross,
   '/compensation_funds': cilHome, '/pension_funds': cilStorage, '/file_types': cilFile, '/person_types': cilList, '/document_types': cilList,
   '/reports': cilChartPie, '/locations': cilLocationPin, '/users': cilUser, '/roles': cilShieldAlt, '/permissions': cilLockLocked, '/modules': cilApplications,
+  // Integraciones: el icono sale de config/integrationScreens.js
+  ...Object.fromEntries(Object.entries(integrationScreens).filter(([, screen]) => screen[3]).map(([slug, screen]) => [`/integration/${slug}`, screen[3]])),
 }
 
 // Ícono de cada módulo
-const moduleIcons = { 'Producción': cilIndustry, 'Catálogos': cilTag, 'Comercial': cilCart, 'Reportes': cilChartPie, 'Administración': cilBuilding, 'Parámetros': cilOptions, 'Configuración': cilSettings }
+// El orden de los módulos y submódulos lo entrega el backend (columna position); esta lista solo es el respaldo si no llega
+const moduleIcons = { 'Configuración': cilSettings, 'Administración': cilBuilding, 'Parámetros': cilOptions, 'Catálogos': cilTag, 'Comercial': cilCart, 'Producción': cilIndustry, 'Integraciones': cilSync, 'Reportes': cilChartPie }
 const order = Object.keys(moduleIcons)
 
 // Un módulo se abre solo si la ruta actual es una de sus páginas
@@ -72,7 +76,9 @@ const groups = computed(() => {
     }))
     .filter((g) => g.items.length)
   const rank = (n) => (order.includes(n) ? order.indexOf(n) : order.length)
-  if (dynamic.length) return dynamic.sort((a, b) => rank(a.name) - rank(b.name))
+  // Con las posiciones del backend ya viene en orden; si no llegan, se ordena con la lista de respaldo
+  const positioned = auth.navegation.every((m) => Number.isFinite(m.position))
+  if (dynamic.length) return positioned ? dynamic : dynamic.sort((a, b) => rank(a.name) - rank(b.name))
 
   return fallback
     .map((g) => ({ name: g.name, items: g.items.filter((i) => auth.can(i.permission)) }))

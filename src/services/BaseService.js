@@ -11,6 +11,36 @@ export async function call(request) {
   }
 }
 
+// Descarga de archivos (xlsx, pdf): `request` debe pedir responseType 'blob'. Devuelve { blob, name } con el nombre de content-disposition.
+// En error el cuerpo llega como Blob: se lee para conservar el mensaje de la API.
+export async function callBlob(request, fallbackName = 'archivo') {
+  try {
+    const response = await request()
+    const disposition = response.headers['content-disposition'] ?? ''
+    const name = /filename="?([^";]+)"?/.exec(disposition)?.[1] ?? fallbackName
+    return { blob: response.data, name }
+  } catch (error) {
+    const text = error.response?.data instanceof Blob ? await error.response.data.text() : null
+    let body = null
+    try {
+      body = text ? JSON.parse(text) : error.response?.data
+    } catch {
+      body = null
+    }
+    throw body ?? { message: 'Error desconocido' }
+  }
+}
+
+// Guarda en el equipo un archivo recibido con callBlob
+export function saveBlob({ blob, name }) {
+  const url = URL.createObjectURL(blob)
+  const link = Object.assign(document.createElement('a'), { href: url, download: name })
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
 // Servicio de solo lectura (ubicaciones, auditoría)
 export function readOnlyService(base) {
   return {

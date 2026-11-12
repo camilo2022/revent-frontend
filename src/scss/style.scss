@@ -59,7 +59,9 @@ body {
 .sidebar-header { min-height: calc(4rem + 1px); }
 .header > .container-fluid + .container-fluid { min-height: 3rem; }
 .footer { min-height: calc(3rem + 1px); }
-.sidebar-nav .nav-icon { display: inline-flex; align-items: center; justify-content: center; }
+.sidebar-nav .nav-icon { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+// Los nombres largos del menú (p. ej. los de Integraciones) se parten en dos líneas en vez de recortarse
+.sidebar-nav .nav-link { white-space: normal; line-height: 1.25; }
 .card-header { font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--kanri-navy); }
 // Flecha roja antes del título, como en Kanri
 .card-header > strong:first-child::before, .card-header > h5:first-child::before {

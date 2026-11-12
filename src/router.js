@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { integrationScreens } from '@/config/integrationScreens'
 
 // Una ruta por recurso: path => [Controlador, título, permiso]. Crear/editar/ver son paneles dentro del controlador.
 const resources = {
@@ -26,9 +27,21 @@ const resources = {
   },
 }
 
+// Integraciones: una ruta por pantalla de config/integrationScreens.js (las que aún no tienen controlador no se registran)
+const integrationControllers = import.meta.glob('./components/controllers/Integration/*Controller.vue')
+const integrationRoutes = Object.entries(integrationScreens)
+  .map(([slug, [name, title, permission, , siigo = []]]) => ({
+    path: `integration/${slug}`,
+    component: integrationControllers[`./components/controllers/Integration/${name}Controller.vue`],
+    meta: { title, permission, siigo },
+  }))
+  .filter((route) => route.component)
+
 const children = [
   { path: '', name: 'dashboard', component: () => import('@/pages/Dashboard.vue'), meta: { title: 'Inicio' } },
   { path: 'profile', component: () => import('@/pages/Profile.vue'), meta: { title: 'Mi perfil' } },
+  { path: 'siigo_authorization', component: () => import('@/pages/SiigoAuthorization.vue'), meta: { title: 'Autorización Siigo' } },
+  ...integrationRoutes,
   ...Object.entries(resources).flatMap(([group, items]) =>
     Object.entries(items).map(([path, [name, title, permission]]) => ({
       path,

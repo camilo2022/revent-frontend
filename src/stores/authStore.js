@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import AuthService from '@/services/AuthService'
+import { useIntegrationStore } from '@/stores/integrationStore'
 import { readToken, removeToken, saveToken } from '@/utils/cookies'
 
 // Sesión: el token vive en una cookie y el usuario en localStorage (persistedstate)
@@ -43,6 +44,7 @@ export const useAuthStore = defineStore(
       removeToken()
       navegation.value = []
       loaded.value = false
+      useIntegrationStore().clearAll() // el token y la cookie de Siigo se borran con la sesión del sistema
     }
 
     const logout = async () => {

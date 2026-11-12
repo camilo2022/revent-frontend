@@ -4,7 +4,10 @@ import { personName, date } from '@/utils/configHelpers'
 // Campos, columnas y filtros del recurso (lo leen el controlador y las plantillas)
 export const configuration = {
   title: 'Usuarios', singular: 'usuario', permission: 'users', listKey: 'users', withTrashed: true, formMode: 'page',
-  extraActions: [{ label: 'Permisos', permission: 'users.authorization.assign', panel: 'permissions' }],
+  extraActions: [
+    { label: 'Permisos', permission: 'users.authorization.assign', panel: 'permissions' },
+    { label: 'Bodegas (tiendas)', permission: 'users.stores.assign', panel: 'stores' },
+  ],
   columns: [
     { key: 'username', label: 'Usuario' }, // la API no ordena por username
     { key: 'employee_id', label: 'Empleado', value: (r) => personName(r.employee?.person) },
