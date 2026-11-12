@@ -20,6 +20,8 @@ app.use(pinia)
 app.use(router)
 app.use(CoreuiVue)
 app.component('CIcon', CIcon)
+// CIcon busca aquí los iconos que se piden por nombre; los de la app se pasan siempre como objeto, así que va vacío (evita el aviso de Vue)
+app.provide('icons', {})
 app.directive('can', vCan)
 
 setTokenGetter(() => useAuthStore().token)

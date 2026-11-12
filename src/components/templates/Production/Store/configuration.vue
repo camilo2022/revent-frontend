@@ -32,6 +32,7 @@ export const configuration = {
     { key: 'code', label: 'Código', required: true, maxlength: 5 },
     { key: 'name', label: 'Nombre', required: true, maxlength: 100 },
     contactFields[0], contactFields[1], contactFields[2],
+    { key: 'email', label: 'Correo de notificaciones', type: 'email', maxlength: 255, hint: 'Opcional. A este correo llega copia de las recepciones de órdenes de compra de la tienda. Puede repetirse en varias tiendas.' },
     {
       key: 'siigo_warehouse_id', type: 'remote', service: warehousePicker(false), listKey: 'warehouses', params: {}, labelFn: warehouseLabel, label: 'Bodega de Siigo',
       hint: 'La bodega de Siigo que corresponde a esta tienda. Con ella el usuario asignado puede operar en esa bodega.',
@@ -46,6 +47,7 @@ export const configuration = {
   show: [
     { label: 'Código', value: (e) => e.code }, { label: 'Nombre', value: (e) => e.name },
     { label: 'Ubicación', value: (e) => e.location?.name }, { label: 'Dirección', value: (e) => e.address }, { label: 'Barrio', value: (e) => e.neighborhood },
+    { label: 'Correo de notificaciones', value: (e) => e.email || '-' },
     { label: 'Bodega Siigo', value: (e) => warehouseValue(e.siigo_warehouse_id) }, { label: 'Tránsito', value: (e) => warehouseValue(e.siigo_transit_warehouse_id) },
   ],
 }

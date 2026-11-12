@@ -58,12 +58,13 @@ const onEnter = () => {
         :disabled="disabled"
         autocomplete="off"
         @focus="onFocus"
+        @click="onFocus"
         @blur="onBlur"
         @input="query = $event.target.value"
         @keydown.enter.prevent="onEnter"
         @keydown.esc="open = false"
       />
-      <button v-if="model !== '' && model !== null && model !== undefined && !disabled" type="button" class="btn btn-outline-secondary" title="Quitar selección" @mousedown.prevent="clear">&times;</button>
+      <button v-if="model !== '' && model !== null && model !== undefined && !disabled" type="button" class="btn btn-outline-secondary" title="Quitar selección" @mousedown.prevent @click="clear">&times;</button>
     </div>
     <ul v-if="open" class="list-group position-absolute w-100 shadow-sm" style="z-index: 1050; max-height: 260px; overflow-y: auto">
       <li v-if="!filtered.length" class="list-group-item text-body-secondary">{{ emptyText }}</li>
@@ -73,7 +74,8 @@ const onEnter = () => {
         class="list-group-item list-group-item-action"
         :class="{ active: String(o.value) === String(model) }"
         role="button"
-        @mousedown.prevent="choose(o)"
+        @mousedown.prevent
+        @click="choose(o)"
       >{{ o.label }}</li>
     </ul>
   </div>

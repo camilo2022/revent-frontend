@@ -34,7 +34,8 @@ const clear = () => {
 </script>
 
 <template>
-  <CModal teleport :visible="visible" alignment="center" scrollable @close="visible = false">
+  <!-- backdrop estático: un clic fuera no lo cierra; se cierra con «Aplicar filtros», «Limpiar» o la X -->
+  <CModal teleport backdrop="static" :visible="visible" alignment="center" scrollable @close="visible = false">
     <CModalHeader><CModalTitle>Filtros avanzados</CModalTitle></CModalHeader>
     <CModalBody>
       <div class="d-flex flex-column gap-3">
