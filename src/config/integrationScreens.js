@@ -6,7 +6,7 @@
 // - El icono (de '@coreui/icons') se usa en el menú lateral; se parece al de la tarjeta de "Acciones disponibles" del home.
 import {
   cilCamera, cilCart, cilCheckCircle, cilCreditCard, cilDescription, cilFindInPage, cilGlobeAlt, cilHome,
-  cilInbox, cilListFilter, cilLoop, cilPeople, cilSearch, cilSync, cilTask, cilTruck,
+  cilInbox, cilListFilter, cilLoop, cilPeople, cilSearch, cilSwapHorizontal, cilSync, cilTask, cilTruck,
 } from '@coreui/icons'
 
 export const integrationScreens = {
@@ -15,6 +15,8 @@ export const integrationScreens = {
   exports_invoice_360: ['ExportsInvoice360', 'Exporte de facturas 360', 'integration.exports_invoice_360.send', cilGlobeAlt, []], // globo
   exports_purchase: ['ExportsPurchase', 'Exporte de compras', 'integration.exports_purchase.send', cilCart, []], // carrito
   sync_unico: ['SyncUnico', 'Sincronización con Único', 'integration.sync_unico.runs', cilSync, []], // refrescar
+  // Effi no usa credenciales de Siigo del navegador: el backend consulta Siigo con su propio token y Effi con su API key
+  effi_sync: ['EffiSync', 'Sincronización con Effi', 'integration.effi_sync.compare', cilSwapHorizontal, []], // flechas Siigo ⇄ Effi
   masive_transfers: ['MasiveTransfers', 'Traslados masivos', 'integration.masive_transfers.format', cilLoop, []], // flechas de intercambio
   // La cookie solo se usa para descargar el formato; la carga del archivo no la necesita (ya viene dentro del Excel)
   masive_purchase_orders: ['MasivePurchaseOrders', 'Órdenes de compra masivas', 'integration.masive_purchase_orders.types', cilTask, ['cookie']], // portapapeles con visto
