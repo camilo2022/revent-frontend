@@ -25,6 +25,9 @@ const resources = {
     suppliers: ['Supplier', 'Proveedores', 'suppliers.all'], stores: ['Store', 'Tiendas', 'stores.all'],
     reports: ['Report', 'Reportes', 'reports.all'],
   },
+  Requisition: {
+    request_types: ['RequestType', 'Tipos de solicitud', 'request_types.all'], requisitions: ['Requisition', 'Solicitudes', 'requisitions.all'],
+  },
 }
 
 // Integraciones: una ruta por pantalla de config/integrationScreens.js (las que aún no tienen controlador no se registran)

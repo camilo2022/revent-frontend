@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import {
   cilSpeedometer, cilColorPalette, cilResizeBoth, cilTag, cilLayers, cilBasket, cilDescription, cilIndustry, cilCircle, cilSettings,
   cilBuilding, cilApplications, cilPeople, cilUser, cilLockLocked, cilShieldAlt, cilList, cilHistory, cilStorage, cilBriefcase,
-  cilMedicalCross, cilHome, cilFile, cilLocationPin, cilSitemap, cilCart, cilOptions, cilChartPie, cilSync,
+  cilMedicalCross, cilHome, cilFile, cilLocationPin, cilSitemap, cilCart, cilOptions, cilChartPie, cilSync, cilNotes, cilListRich,
 } from '@coreui/icons'
 import { useAuthStore } from '@/stores/authStore'
 import { useUiStore } from '@/stores/uiStore'
@@ -24,6 +24,7 @@ const icons = {
   '/genders': cilPeople, '/blood_types': cilMedicalCross, '/risk_managers': cilShieldAlt, '/health_entities': cilMedicalCross,
   '/compensation_funds': cilHome, '/pension_funds': cilStorage, '/file_types': cilFile, '/person_types': cilList, '/document_types': cilList,
   '/reports': cilChartPie, '/locations': cilLocationPin, '/users': cilUser, '/roles': cilShieldAlt, '/permissions': cilLockLocked, '/modules': cilApplications,
+  '/requisitions': cilNotes, '/request_types': cilListRich,
   // Integraciones: el icono sale de config/integrationScreens.js
   ...Object.fromEntries(Object.entries(integrationScreens).filter(([, screen]) => screen[3]).map(([slug, screen]) => [`/integration/${slug}`, screen[3]])),
 }
@@ -47,7 +48,7 @@ const fallback = [
     item('Colores', '/colors', 'colors.all'), item('Tallas', '/sizes', 'sizes.all'), item('Marcas', '/trademarks', 'trademarks.all'),
     item('Categorías', '/categories', 'categorization.categories.all'),
   ] },
-  { name: 'Comercial', items: [item('Proveedores', '/suppliers', 'suppliers.all'), item('Tiendas', '/stores', 'stores.all')] },
+  { name: 'Comercial', items: [item('Proveedores', '/suppliers', 'suppliers.all'), item('Tiendas', '/stores', 'stores.all'), item('Solicitudes', '/requisitions', 'requisitions.all')] },
   { name: 'Reportes', items: [item('Reportes', '/reports', 'reports.all')] },
   { name: 'Administración', items: [
     item('Personas', '/people', 'people.all'), item('Empleados', '/employees', 'employees.all'),
@@ -112,7 +113,7 @@ const groups = computed(() => {
           <CIcon :icon="moduleIcons[group.name] ?? cilApplications" class="nav-icon" /> {{ group.name }}
         </template>
         <li v-for="item in group.items" :key="item.url" class="nav-item">
-          <RouterLink :to="item.url" class="nav-link" active-class="active">
+          <RouterLink :to="item.url" class="nav-link nav-sublink" active-class="active">
             <span class="nav-icon"><CIcon :icon="icons[item.url] ?? cilCircle" size="sm" /></span> {{ item.name }}
           </RouterLink>
         </li>
@@ -124,3 +125,18 @@ const groups = computed(() => {
     </CSidebarFooter>
   </CSidebar>
 </template>
+
+<style scoped>
+/* Submódulos corridos a la derecha, con una línea guía, para distinguirlos del módulo al que pertenecen */
+.nav-sublink {
+  margin-left: 1.25rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0;
+}
+/* Menú contraído: sin sangría, solo se ven los iconos */
+.sidebar-narrow .nav-sublink,
+.sidebar-narrow-unfoldable:not(:hover) .nav-sublink {
+  margin-left: 0;
+  border-left: 0;
+}
+</style>

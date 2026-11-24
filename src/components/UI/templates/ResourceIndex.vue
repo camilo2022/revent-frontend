@@ -12,10 +12,9 @@ import Skeleton from './Skeleton.vue'
 const props = defineProps({ ctrl: { type: Object, required: true }, config: { type: Object, required: true } })
 const auth = useAuthStore()
 const showCreate = () => !props.config.readonly
-const canCreate = () => auth.can(`${props.config.permission}.store`)
 // Vacío: distinto si es por búsqueda/filtro o porque aún no hay registros
 const filtered = () => !!props.ctrl.pagination.search || Object.entries(props.ctrl.filters).some(([k, v]) => k !== 'with_trashed' && (v === true || (v !== '' && v !== false && v != null)))
-const emptyText = () => (filtered() ? 'No hay resultados con esta búsqueda o filtro.' : `Aún no hay ${props.config.title.toLowerCase()}.`)
+const emptyText = () => (filtered() ? 'No hay resultados con esta búsqueda o filtro.' : 'Sin registros: todavía no hay información.')
 // En pantallas pequeñas solo se ven la primera columna (nombre/código), el estado y las acciones
 const KEEP = ['name', 'code', 'consecutive', 'username', 'status']
 const colClass = (col, i) => {
@@ -54,10 +53,9 @@ const colClass = (col, i) => {
       </div>
 
       <Skeleton v-if="ctrl.loading" :variant="ctrl.pagination.mode === 'grid' ? 'cards' : 'table'" />
+      <!-- Sin registros solo se informa; para crear está el botón de arriba a la derecha -->
       <EmptyState v-else-if="!ctrl.items.length" :text="emptyText()">
-        <p v-if="!filtered() && canCreate()" class="mb-2 small">Crea {{ config.singular }} para empezar.</p>
-        <Button v-if="!filtered() && showCreate()" :permission="`${config.permission}.store`" color="success" :icon="cilPlus" @click="ctrl.goCreate()">Crear {{ config.singular }}</Button>
-        <Button v-else-if="filtered()" color="secondary" variant="outline" @click="ctrl.onSearch('')">Limpiar búsqueda</Button>
+        <Button v-if="filtered()" color="secondary" variant="outline" @click="ctrl.onSearch('')">Limpiar búsqueda</Button>
       </EmptyState>
 
       <!-- Modo tabla: encabezado fijo al desplazar -->

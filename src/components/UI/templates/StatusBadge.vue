@@ -3,8 +3,11 @@ import { computed } from 'vue'
 
 const props = defineProps({ status: String })
 
-// Color por estado de fichas y órdenes
-const colors = { Pendiente: 'warning', 'En revision': 'info', Aprobado: 'success', Cancelado: 'danger' }
+// Color por estado de fichas, órdenes y solicitudes
+const colors = {
+  Pendiente: 'warning', 'En revision': 'info', Aprobado: 'success', Cancelado: 'danger',
+  'En revisión': 'info', Aprobada: 'success', 'En proceso': 'primary', Completada: 'dark', Rechazada: 'danger',
+}
 const color = computed(() => colors[props.status] ?? 'secondary')
 </script>
 

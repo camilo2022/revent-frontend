@@ -15,6 +15,8 @@ const perm = (action) => (props.config.permission ? `${props.config.permission}.
 const title = (t) => `${t} ${props.config.singular}`
 // Sin permiso el botón se ve desactivado y avisa con su ayuda
 const hint = (allowed, text) => (allowed ? text : 'No tienes permiso para esta acción')
+// Regla opcional por registro (config.rowCan): oculta lo que no aplica a esa fila, ej. editar una solicitud ya en gestión
+const rowAllows = (action) => props.config.rowCan?.(action, props.row) ?? true
 </script>
 
 <template>
@@ -29,14 +31,14 @@ const hint = (allowed, text) => (allowed ? text : 'No tienes permiso para esta a
     ><CIcon :icon="cilHistory" /></CButton>
     <AuditTimeline v-if="auditOpen" :base="ctrl.service.base" :id="row.id" :title="rowTitle()" @close="auditOpen = false" />
     <template v-if="row.deleted_at">
-      <CButton :disabled="!auth.can(perm('restore'))" color="success" variant="outline" size="sm" :title="hint(auth.can(perm('restore')), title('Restaurar'))" :aria-label="title('Restaurar')" @click="ctrl.restore(row)"><CIcon :icon="cilReload" /></CButton>
+      <CButton v-if="rowAllows('restore')" :disabled="!auth.can(perm('restore'))" color="success" variant="outline" size="sm" :title="hint(auth.can(perm('restore')), title('Restaurar'))" :aria-label="title('Restaurar')" @click="ctrl.restore(row)"><CIcon :icon="cilReload" /></CButton>
     </template>
     <template v-else-if="!config.readonly">
       <template v-for="a in config.extraActions" :key="a.label">
         <CButton :disabled="!auth.can(a.permission)" color="dark" variant="outline" size="sm" :title="hint(auth.can(a.permission), a.label)" :aria-label="a.label" @click="ctrl.goPanel(a.panel, row)"><CIcon :icon="a.sub ? cilList : (panelIcons[a.panel] ?? cilApplications)" /></CButton>
       </template>
-      <CButton :disabled="!auth.can(perm('update'))" color="primary" variant="outline" size="sm" :title="hint(auth.can(perm('update')), title('Editar'))" :aria-label="title('Editar')" @click="ctrl.goEdit(row)"><CIcon :icon="cilPencil" /></CButton>
-      <CButton v-if="!config.noDelete" :disabled="!auth.can(perm('delete'))" color="danger" variant="outline" size="sm" :title="hint(auth.can(perm('delete')), title('Eliminar'))" :aria-label="title('Eliminar')" @click="ctrl.remove(row)"><CIcon :icon="cilTrash" /></CButton>
+      <CButton v-if="rowAllows('update')" :disabled="!auth.can(perm('update'))" color="primary" variant="outline" size="sm" :title="hint(auth.can(perm('update')), title('Editar'))" :aria-label="title('Editar')" @click="ctrl.goEdit(row)"><CIcon :icon="cilPencil" /></CButton>
+      <CButton v-if="!config.noDelete && rowAllows('delete')" :disabled="!auth.can(perm('delete'))" color="danger" variant="outline" size="sm" :title="hint(auth.can(perm('delete')), title('Eliminar'))" :aria-label="title('Eliminar')" @click="ctrl.remove(row)"><CIcon :icon="cilTrash" /></CButton>
     </template>
   </div>
 </template>

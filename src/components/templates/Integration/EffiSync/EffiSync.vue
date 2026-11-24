@@ -77,7 +77,6 @@ const plan = ref(null)
 const planTab = ref('ok')
 const stepFilter = ref('todos')
 const choices = reactive({ modelos: {}, duplicados: {} })
-const confirmText = ref('')
 const launching = ref(false)
 const launched = ref(null)
 
@@ -87,7 +86,6 @@ const loadPlan = async () => {
     plan.value = (await EffiSyncService.plan()).data.plan
     choices.modelos = {}
     choices.duplicados = {}
-    confirmText.value = ''
     stepFilter.value = 'todos'
     planTab.value = totalDecisions.value ? 'dec' : 'ok'
   } catch (error) {
@@ -154,14 +152,13 @@ const applyRecommended = () => {
   })
 }
 
-const canSync = computed(() => plan.value?.sincronizacion_activa && pendingDecisions.value === 0 && confirmText.value.trim() === 'SINCRONIZAR')
+const canSync = computed(() => plan.value?.sincronizacion_activa && pendingDecisions.value === 0)
 
 const launch = async (body) => {
   launching.value = true
   try {
     const res = await EffiSyncService.sync({ confirmacion: 'SINCRONIZAR', decisiones: { modelos: choices.modelos, duplicados: choices.duplicados }, ...body })
     launched.value = { message: res.message, emails: res.data.sync.correos || [] }
-    confirmText.value = ''
     await pollStatus()
   } catch (error) {
     alerts.error(errorMessage(error))
@@ -169,7 +166,11 @@ const launch = async (body) => {
     launching.value = false
   }
 }
-const syncAll = () => launch({})
+// Un solo botón con confirmación (la API recibe la confirmación escrita que exige el backend)
+const syncAll = async () => {
+  const ok = await confirmAction({ title: '¿Está seguro que desea sincronizar?', text: 'Se escribirá en Effi: referencias, artículos nuevos y ajustes de inventario para dejarlo igual a la bodega WEB de Siigo.', confirmText: 'Sí, sincronizar' })
+  if (ok) launch({})
+}
 const testOne = async (code) => {
   const ok = await confirmAction({ title: `¿Sincronizar solo ${code}?`, text: 'Se escribe en Effi de verdad, pero únicamente ese código. Sirve para probar antes de sincronizar todo.', confirmText: 'Sí, sincronizar' })
   if (ok) launch({ solo: code })
@@ -366,12 +367,11 @@ onBeforeUnmount(() => clearTimeout(timer))
           </CAlert>
           <div v-else class="border-top mt-3 pt-3">
             <p class="small mb-2">
-              Para ejecutar el plan escribe <strong>SINCRONIZAR</strong> y pulsa el botón. Esto <strong>escribe en Effi</strong> (referencias, artículos nuevos y ajustes de inventario) en segundo plano.
+              Al sincronizar se <strong>escribe en Effi</strong> (referencias, artículos nuevos y ajustes de inventario) en segundo plano.
               <template v-if="(plan.correos || []).length">El resultado llega por correo a <strong>{{ plan.correos.join(', ') }}</strong>.</template>
             </p>
             <div class="d-flex flex-wrap gap-2 align-items-center">
-              <input v-model="confirmText" type="text" class="form-control w-auto" placeholder="SINCRONIZAR" />
-              <Button :loading="launching" permission="integration.effi_sync.sync" :icon="cilSync" :disabled="!canSync || running" @click="syncAll">Sincronizar con Effi</Button>
+              <Button :loading="launching" permission="integration.effi_sync.sync" :icon="cilSync" :disabled="!canSync || running" @click="syncAll">Sincronizar</Button>
               <small v-if="pendingDecisions" class="text-warning-emphasis">Faltan {{ pendingDecisions }} decisiones por responder.</small>
               <small v-if="running" class="text-body-secondary">Hay una sincronización en curso.</small>
             </div>
