@@ -12,6 +12,7 @@ import Button from '@/components/UI/templates/Button.vue'
 import FormField from '@/components/UI/templates/FormField.vue'
 import LoadingForm from '@/components/UI/templates/Skeleton.vue'
 import StatusBadge from '@/components/UI/templates/StatusBadge.vue'
+import { STATUSES } from './configuration.vue'
 
 // Detalle de una solicitud: sus respuestas (con los campos con que se llenó) y, para quien gestiona, el cambio de estado
 const props = defineProps({ id: { type: [String, Number], required: true } })
@@ -38,8 +39,8 @@ const load = async () => {
 }
 onMounted(load)
 
-const mine = computed(() => requisition.value?.user_id === auth.user?.id)
-const editable = computed(() => mine.value && requisition.value?.status === 'pending' && !requisition.value?.deleted_at)
+const mine = computed(() => requisition.value?.user_created?.id === auth.user?.id)
+const editable = computed(() => mine.value && requisition.value?.status === STATUSES.PENDING && !requisition.value?.deleted_at)
 const manageable = computed(() => can('requisitions.manage') && !requisition.value?.deleted_at && requisition.value?.next_statuses?.length)
 
 // Respuestas agrupadas por sección
@@ -70,7 +71,7 @@ const answer = (f) => {
 const isLink = (v) => typeof v === 'string' && /^https?:\/\/\S+$/.test(v)
 
 const changeStatus = async () => {
-  const label = requisition.value.next_statuses.find((s) => s.status === nextStatus.value)?.label
+  const label = nextStatus.value
   if (!(await confirmAction({ title: `¿Pasar la solicitud N° ${props.id} a «${label}»?`, text: statusObservation.value || 'Sin observación.', confirmText: 'Sí, cambiar' }))) return
   busy.value = true
   clear()
@@ -113,10 +114,11 @@ const cancelRequisition = async () => {
       </CCardHeader>
       <CCardBody>
         <CRow class="g-3">
-          <CCol md="3"><div class="small text-body-secondary">Estado</div><StatusBadge :status="requisition.status_label" /><CBadge v-if="requisition.deleted_at" color="secondary" class="ms-1">Anulada</CBadge></CCol>
+          <CCol md="3"><div class="small text-body-secondary">Estado</div><StatusBadge :status="requisition.status" /><CBadge v-if="requisition.deleted_at" color="secondary" class="ms-1">Anulada</CBadge></CCol>
           <CCol md="3"><div class="small text-body-secondary">Fecha</div>{{ dayjs(requisition.date).format('DD/MM/YYYY') }}</CCol>
-          <CCol md="3"><div class="small text-body-secondary">Creada por</div>{{ requisition.user?.name }} <span class="small text-body-secondary">({{ requisition.user?.username }})</span></CCol>
-          <CCol md="3"><div class="small text-body-secondary">Última actualización</div>{{ dayjs(requisition.updated_at).format('DD/MM/YYYY hh:mm A') }}</CCol>
+          <CCol md="3"><div class="small text-body-secondary">Creada por</div>{{ requisition.user_created?.name ?? '-' }} <span v-if="requisition.user_created" class="small text-body-secondary">({{ requisition.user_created.username }})</span></CCol>
+          <!-- Último que la actualizó (quien la gestiona al cambiar el estado) -->
+          <CCol md="3"><div class="small text-body-secondary">Última actualización</div>{{ requisition.user_updated?.name ?? '-' }}<div class="small text-body-secondary">{{ dayjs(requisition.updated_at).format('DD/MM/YYYY hh:mm A') }}</div></CCol>
           <CCol v-if="requisition.observation" md="6"><div class="small text-body-secondary">Observación</div>{{ requisition.observation }}</CCol>
           <CCol v-if="requisition.status_observation" md="6"><div class="small text-body-secondary">Observación de gestión</div>{{ requisition.status_observation }}</CCol>
         </CRow>
@@ -131,12 +133,12 @@ const cancelRequisition = async () => {
             <FormField label="Pasar a" required :error="get('status')">
               <CFormSelect v-model="nextStatus">
                 <option value="">Selecciona...</option>
-                <option v-for="s in requisition.next_statuses" :key="s.status" :value="s.status">{{ s.label }}</option>
+                <option v-for="s in requisition.next_statuses" :key="s" :value="s">{{ s }}</option>
               </CFormSelect>
             </FormField>
           </CCol>
           <CCol md="8">
-            <FormField label="Observación de gestión" :required="nextStatus === 'rejected'" :error="get('status_observation')" hint="Obligatoria al rechazar.">
+            <FormField label="Observación de gestión" :required="nextStatus === STATUSES.REJECTED" :error="get('status_observation')" hint="Obligatoria al rechazar.">
               <CFormInput v-model="statusObservation" maxlength="1000" />
             </FormField>
           </CCol>

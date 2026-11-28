@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { cilArrowLeft, cilBan, cilChartLine, cilCheckAlt, cilColumns, cilCloudDownload, cilFilter, cilX } from '@coreui/icons'
+import { cilArrowLeft, cilBan, cilChartLine, cilCheckAlt, cilColumns, cilCloudDownload, cilFilter, cilMagnifyingGlass, cilX } from '@coreui/icons'
 import ReportService from '@/services/ReportService'
 import { useOptions } from '@/composables/useOptions'
 import { useAuthStore } from '@/stores/authStore'
@@ -29,6 +29,8 @@ const shown = ref(100)
 const columnsOpen = ref(false)
 const columnSearch = ref('')
 const pivot = ref(false)
+const context = ref('') // valor del filtro obligatorio del reporte (ej. tipo de solicitud)
+const loadingContext = ref(false)
 
 const canGenerate = computed(() => auth.can('reports.generate'))
 const canExport = computed(() => auth.can('reports.export'))
@@ -49,6 +51,7 @@ const open = async (report) => {
   result.value = null
   current.value = report
   pivot.value = false
+  context.value = ''
   columnSearch.value = ''
   Object.keys(filters).forEach((k) => delete filters[k])
   // Los filtros se preparan antes de cargar las listas para que la pantalla ya tenga con qué dibujarse
@@ -59,6 +62,25 @@ const open = async (report) => {
   const keys = Object.values(report.filters ?? {}).filter((f) => f.type === 'select' && !f.options).map((f) => f.data)
   if (keys.length) await loadOptions([...new Set(keys)])
 }
+// Al elegir el contexto (ej. tipo de solicitud) se traen sus campos como columnas, todas marcadas
+const changeContext = async (value) => {
+  context.value = value
+  result.value = null
+  clear()
+  if (!value) return
+  loadingContext.value = true
+  try {
+    const report = (await ReportService.find(current.value.id, { context: value })).data.report
+    current.value = { ...current.value, fields: report.fields }
+    selected.value = report.fields.flatMap((g) => g.fields.map((f) => f.data_key))
+  } catch (error) {
+    alerts.error(errorMessage(error))
+  } finally {
+    loadingContext.value = false
+  }
+}
+const needsContext = computed(() => !!current.value?.context && !context.value)
+
 const back = () => {
   current.value = null
   result.value = null
@@ -112,7 +134,7 @@ const body = () => {
   })
   // Los campos se envían en el orden de la definición del reporte
   const order = current.value.fields.flatMap((g) => g.fields.map((f) => f.data_key))
-  return { fields: order.filter(fieldOn), filters: active, ...(current.value.pivot && pivot.value ? { pivot: true } : {}) }
+  return { fields: order.filter(fieldOn), filters: active, ...(current.value.context ? { context: context.value } : {}), ...(current.value.pivot && pivot.value ? { pivot: true } : {}) }
 }
 
 const generate = async () => {
@@ -186,6 +208,14 @@ const totals = computed(() => Object.fromEntries((result.value?.columns ?? []).f
       </CCardHeader>
       <CCardBody>
         <p class="text-body-secondary mb-4">{{ current.description }}</p>
+
+        <!-- Filtro obligatorio del reporte (ej. tipo de solicitud): sus campos pasan a ser columnas -->
+        <div v-if="current.context" class="mb-4" style="max-width: 420px">
+          <label class="form-label mb-1">{{ current.context.label }} <span class="text-danger">*</span></label>
+          <ComboSelect :model-value="context" :options="current.context.options" :invalid="!!get('context')" :disabled="loadingContext" placeholder="Escribe o selecciona..." @change="changeContext" />
+          <div v-if="get('context')" class="invalid-feedback d-block">{{ get('context') }}</div>
+          <small v-else-if="!context" class="text-body-secondary">Elige el {{ current.context.label.toLowerCase() }} para ver sus columnas.</small>
+        </div>
 
         <!-- Filtros dinámicos -->
         <div class="border rounded-3 p-3 mb-4">
@@ -261,10 +291,10 @@ const totals = computed(() => Object.fromEntries((result.value?.columns ?? []).f
         </div>
 
         <div class="d-flex flex-wrap gap-2">
-          <CButton color="primary" :disabled="busy || !selected.length || !canGenerate" :title="canGenerate ? '' : 'No tienes permiso para esta acción'" @click="generate">
+          <CButton color="primary" :disabled="busy || needsContext || !selected.length || !canGenerate" :title="canGenerate ? '' : 'No tienes permiso para esta acción'" @click="generate">
             <CSpinner v-if="busy" size="sm" class="me-1" /><CIcon v-else :icon="cilChartLine" class="me-1" />Generar
           </CButton>
-          <CButton color="success" variant="outline" :disabled="busy || !selected.length || !canExport" :title="canExport ? 'Descarga el reporte en Excel' : 'No tienes permiso para esta acción'" @click="download">
+          <CButton color="success" variant="outline" :disabled="busy || needsContext || !selected.length || !canExport" :title="canExport ? 'Descarga el reporte en Excel' : 'No tienes permiso para esta acción'" @click="download">
             <CIcon :icon="cilCloudDownload" class="me-1" />Exportar a Excel
           </CButton>
         </div>
@@ -286,7 +316,16 @@ const totals = computed(() => Object.fromEntries((result.value?.columns ?? []).f
             </CTableHead>
             <CTableBody>
               <CTableRow v-for="(row, i) in result.rows.slice(0, shown)" :key="i">
-                <CTableDataCell v-for="c in result.columns" :key="c.data_key" :class="{ 'text-end': isPivotCol(c), 'fw-semibold': c.data_key === 'pivot:__total' }">{{ row[c.data_key] }}</CTableDataCell>
+                <CTableDataCell v-for="c in result.columns" :key="c.data_key" :class="{ 'text-end': isPivotCol(c), 'fw-semibold': c.data_key === 'pivot:__total' }">
+                  <!-- Archivos: un botón por archivo para verlo -->
+                  <div v-if="c.type === 'file'" class="d-flex flex-wrap gap-1">
+                    <a v-for="(f, j) in row[c.data_key] ?? []" :key="j" :href="f.url" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary py-0 px-1" :title="`Ver ${f.name}`" :aria-label="`Ver ${f.name}`">
+                      <CIcon :icon="cilMagnifyingGlass" size="sm" />
+                    </a>
+                    <span v-if="!(row[c.data_key] ?? []).length" class="text-body-secondary">-</span>
+                  </div>
+                  <template v-else>{{ row[c.data_key] }}</template>
+                </CTableDataCell>
               </CTableRow>
               <CTableRow v-if="Object.keys(totals).length && shown >= result.rows.length" class="table-light fw-bold">
                 <CTableDataCell v-for="(c, i) in result.columns" :key="c.data_key" :class="{ 'text-end': isPivotCol(c) }">{{ isPivotCol(c) ? totals[c.data_key] : i === 0 ? 'Total' : '' }}</CTableDataCell>

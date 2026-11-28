@@ -3,7 +3,7 @@ import { date } from '@/utils/format'
 import { useAuthStore } from '@/stores/authStore'
 
 // Estados de una solicitud (mismos del backend)
-export const STATUSES = { pending: 'Pendiente', in_review: 'En revisión', approved: 'Aprobada', in_process: 'En proceso', completed: 'Completada', rejected: 'Rechazada' }
+export const STATUSES = { PENDING: 'Pendiente', IN_REVIEW: 'En revisión', APPROVED: 'Aprobado', IN_PROGRESS: 'En progreso', COMPLETED: 'Completado', REJECTED: 'Rechazado' }
 
 // Primer select dinámico con su valor (ej. la tienda), para verlo en el listado
 const relationText = (r) => {
@@ -20,14 +20,14 @@ export const configuration = {
   sort: { column: 'id', dir: 'desc' },
   valueFilters: { mine: '' },
   // Editar, anular y reactivar: solo quien la creó y mientras esté Pendiente (igual que el backend)
-  rowCan: (action, r) => ['update', 'delete', 'restore'].includes(action) ? r.user_id === useAuthStore().user?.id && r.status === 'pending' : true,
+  rowCan: (action, r) => ['update', 'delete', 'restore'].includes(action) ? r.user_created?.id === useAuthStore().user?.id && r.status === STATUSES.PENDING : true,
   columns: [
     { key: 'id', label: 'N°', sortable: true },
     { key: 'request_type', label: 'Tipo', value: (r) => r.request_type?.name ?? '-' },
     { key: 'relation', label: 'Para', value: relationText },
-    { key: 'user', label: 'Creada por', value: (r) => r.user?.name ?? '-' },
+    { key: 'user_created', label: 'Creada por', value: (r) => r.user_created?.name ?? '-' },
     { key: 'date', label: 'Fecha', sortable: true, value: (r) => date(r.date) },
-    { key: 'status', label: 'Estado', sortable: true, type: 'status', value: (r) => r.status_label },
+    { key: 'status', label: 'Estado', sortable: true, type: 'status' },
   ],
   fields: [],
 }

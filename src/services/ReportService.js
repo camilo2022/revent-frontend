@@ -7,7 +7,8 @@ const base = '/reports'
 export default {
   base,
   all: (params = {}) => call(() => http.get(`${base}/all`, { params })),
-  find: (id) => call(() => http.get(`${base}/find/${id}`)),
+  // Con params.context (ej. tipo de solicitud) la definición trae también sus campos
+  find: (id, params = {}) => call(() => http.get(`${base}/find/${id}`, { params })),
   generate: (id, body) => call(() => http.post(`${base}/generate/${id}`, body)),
   export: (id, body) => callBlob(() => http.post(`${base}/export/${id}`, body, { responseType: 'blob' }), 'reporte.xlsx'),
 }
