@@ -9,6 +9,7 @@ import { useServerErrors } from '@/composables/useServerErrors'
 import { errorMessage, listOf } from '@/utils/format'
 import ComboSelect from '@/components/UI/templates/ComboSelect.vue'
 import Skeleton from '@/components/UI/templates/Skeleton.vue'
+import StatusBadge from '@/components/UI/templates/StatusBadge.vue'
 
 // Reportes (misma lógica que Kanri): filtros dinámicos que se agregan y quitan, columnas por grupo en un modal,
 // tallas en horizontal (curva) cuando el reporte lo permite, y generar o exportar a Excel
@@ -62,17 +63,29 @@ const open = async (report) => {
   const keys = Object.values(report.filters ?? {}).filter((f) => f.type === 'select' && !f.options).map((f) => f.data)
   if (keys.length) await loadOptions([...new Set(keys)])
 }
-// Al elegir el contexto (ej. tipo de solicitud) se traen sus campos como columnas, todas marcadas
+// Columnas del reporte: todas marcadas
+const useFields = (fields) => {
+  current.value = { ...current.value, fields }
+  selected.value = fields.flatMap((g) => g.fields.map((f) => f.data_key))
+}
+
+// Al elegir el contexto (ej. tipo de solicitud) se traen sus campos como columnas; al quitarlo vuelven las del reporte
 const changeContext = async (value) => {
-  context.value = value
   result.value = null
   clear()
-  if (!value) return
+  if (!value) {
+    context.value = ''
+    useFields(reports.value.find((r) => r.id === current.value.id)?.fields ?? [])
+    return
+  }
+  const reportId = current.value.id
   loadingContext.value = true
   try {
-    const report = (await ReportService.find(current.value.id, { context: value })).data.report
-    current.value = { ...current.value, fields: report.fields }
-    selected.value = report.fields.flatMap((g) => g.fields.map((f) => f.data_key))
+    const report = (await ReportService.find(reportId, { context: value })).data.report
+    // Si mientras tanto se cambió de reporte, la respuesta ya no aplica
+    if (current.value?.id !== reportId) return
+    context.value = value
+    useFields(report.fields)
   } catch (error) {
     alerts.error(errorMessage(error))
   } finally {
@@ -303,20 +316,25 @@ const totals = computed(() => Object.fromEntries((result.value?.columns ?? []).f
 
     <!-- Resultado -->
     <CCard v-if="result" class="fade-in">
-      <CCardHeader class="d-flex justify-content-between align-items-center">
-        <strong>Resultado</strong>
-        <small class="text-body-secondary">{{ result.rows.length }} fila(s)</small>
+      <CCardHeader class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <strong>{{ current.name }}</strong>
+          <CBadge color="secondary" shape="rounded-pill">{{ result.rows.length }} {{ result.rows.length === 1 ? 'registro' : 'registros' }}</CBadge>
+        </div>
       </CCardHeader>
       <CCardBody>
         <p v-if="!result.rows.length" class="text-body-secondary mb-0">No hay datos con los filtros elegidos.</p>
         <template v-else>
-          <CTable small hover responsive class="mb-2">
+          <!-- Como en Kanri: celdas marcadas, contenido centrado y encabezado fijo al desplazar -->
+          <div class="border rounded-3 overflow-hidden mb-2">
+          <div class="table-responsive table-sticky-wrap">
+          <CTable small hover striped class="table-report table-sticky mb-0">
             <CTableHead>
-              <CTableRow><CTableHeaderCell v-for="c in result.columns" :key="c.data_key" :class="{ 'text-end': isPivotCol(c) }">{{ c.label }}</CTableHeaderCell></CTableRow>
+              <CTableRow><CTableHeaderCell v-for="c in result.columns" :key="c.data_key">{{ c.label }}</CTableHeaderCell></CTableRow>
             </CTableHead>
             <CTableBody>
               <CTableRow v-for="(row, i) in result.rows.slice(0, shown)" :key="i">
-                <CTableDataCell v-for="c in result.columns" :key="c.data_key" :class="{ 'text-end': isPivotCol(c), 'fw-semibold': c.data_key === 'pivot:__total' }">
+                <CTableDataCell v-for="c in result.columns" :key="c.data_key" :class="{ 'fw-semibold': c.data_key === 'pivot:__total' }" :title="c.type === 'file' ? undefined : String(row[c.data_key] ?? '')">
                   <!-- Archivos: un botón por archivo para verlo -->
                   <div v-if="c.type === 'file'" class="d-flex flex-wrap gap-1">
                     <a v-for="(f, j) in row[c.data_key] ?? []" :key="j" :href="f.url" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary py-0 px-1" :title="`Ver ${f.name}`" :aria-label="`Ver ${f.name}`">
@@ -324,14 +342,18 @@ const totals = computed(() => Object.fromEntries((result.value?.columns ?? []).f
                     </a>
                     <span v-if="!(row[c.data_key] ?? []).length" class="text-body-secondary">-</span>
                   </div>
-                  <template v-else>{{ row[c.data_key] }}</template>
+                  <!-- El estado con su color, como en los listados -->
+                  <StatusBadge v-else-if="c.data_key === 'status'" :status="row[c.data_key]" />
+                  <template v-else>{{ row[c.data_key] === '' || row[c.data_key] == null ? '-' : row[c.data_key] }}</template>
                 </CTableDataCell>
               </CTableRow>
               <CTableRow v-if="Object.keys(totals).length && shown >= result.rows.length" class="table-light fw-bold">
-                <CTableDataCell v-for="(c, i) in result.columns" :key="c.data_key" :class="{ 'text-end': isPivotCol(c) }">{{ isPivotCol(c) ? totals[c.data_key] : i === 0 ? 'Total' : '' }}</CTableDataCell>
+                <CTableDataCell v-for="(c, i) in result.columns" :key="c.data_key">{{ isPivotCol(c) ? totals[c.data_key] : i === 0 ? 'Total' : '' }}</CTableDataCell>
               </CTableRow>
             </CTableBody>
           </CTable>
+          </div>
+          </div>
           <div class="d-flex align-items-center gap-3">
             <small class="text-body-secondary">Mostrando {{ Math.min(shown, result.rows.length) }} de {{ result.rows.length }}</small>
             <CButton v-if="shown < result.rows.length" color="secondary" variant="outline" size="sm" @click="shown += 200">Ver más</CButton>

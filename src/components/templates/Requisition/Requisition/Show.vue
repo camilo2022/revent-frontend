@@ -41,7 +41,8 @@ onMounted(load)
 
 const mine = computed(() => requisition.value?.user_created?.id === auth.user?.id)
 const editable = computed(() => mine.value && requisition.value?.status === STATUSES.PENDING && !requisition.value?.deleted_at)
-const manageable = computed(() => can('requisitions.manage') && !requisition.value?.deleted_at && requisition.value?.next_statuses?.length)
+// Quien la creó no la gestiona (igual que el backend)
+const manageable = computed(() => can('requisitions.manage') && !mine.value && !requisition.value?.deleted_at && requisition.value?.next_statuses?.length)
 
 // Respuestas agrupadas por sección
 const sections = computed(() => {

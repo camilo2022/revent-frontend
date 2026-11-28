@@ -138,6 +138,14 @@ body {
 // Listas largas: el encabezado se queda fijo mientras se desplaza la tabla (colores del tema, sirve en oscuro)
 .table-sticky-wrap { max-height: 70vh; overflow: auto; }
 .table-sticky thead th { position: sticky; top: 0; z-index: 2; background-color: var(--cui-card-bg, var(--cui-body-bg)); box-shadow: inset 0 -1px 0 var(--cui-border-color); }
+// Nombres de las columnas en mayúsculas en todas las tablas (listados y reportes)
+.table-sticky thead th { text-transform: uppercase; letter-spacing: 0.02em; }
+// Resultado de reportes (como Kanri): cada celda marcada, contenido centrado y textos largos cortados (completos al pasar el mouse)
+.table-report { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; }
+.table-report > :not(caption) > * > * { border-left: 1px solid var(--cui-border-color); text-align: center; vertical-align: middle; }
+.table-report > :not(caption) > * > :first-child { border-left: 0; }
+.table-report.table-sticky thead th { background-color: var(--cui-tertiary-bg); font-size: 0.78rem; font-weight: 600; white-space: nowrap; padding: 0.65rem 0.75rem; }
+.table-report td { padding: 0.5rem 0.75rem; max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 [data-coreui-theme='dark'] {
   .swal2-popup.swal-revent { background: var(--cui-body-bg); color: var(--cui-body-color); }
   .empty-state svg { opacity: 0.9; }
